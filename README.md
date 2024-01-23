@@ -1,2 +1,3 @@
 # GigaDocument
-AI-powered chat client with RAG based on Knowledge Graph 
+By AI_kabanchiki team\
+Buzmakov`s drones go brrrr
