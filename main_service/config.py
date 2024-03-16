@@ -1,8 +1,15 @@
-from pydantic import BaseModel
-from pydantic_settings import BaseSettings
 from pathlib import Path
+from dotenv import load_dotenv
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pathlib import Path
+import os
+
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 BASE_DIR = Path(__file__).parent
+AUTH_SERVICE_HOST = os.getenv("AUTH_SERVICE_HOST")
+AUTH_SERVICE_PORT = os.getenv("AUTH_SERVICE_PORT")
 
 
 class JWTAuth(BaseModel):
@@ -15,6 +22,8 @@ class JWTAuth(BaseModel):
 
 class Setting(BaseSettings):
     jwt_auth: JWTAuth = JWTAuth()
+    auth_service_url: str = f"http://{AUTH_SERVICE_HOST}:{AUTH_SERVICE_PORT}"
+    model_config = SettingsConfigDict(env_ignore_empty=True)
 
 
 settings: Setting = Setting()
