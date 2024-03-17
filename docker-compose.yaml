@@ -1,16 +1,13 @@
 version: '3.9'
 
 services:
-  microservice1:
-    build: microservice1
+  main_service:
+    container_name: main_service
+    build: main_service/.
     volumes:
-      - ./microservice1:/usr/src/microservice1
-    env_file:
-      - .env
+      - .:/usr/data/app
     ports:
-      - ${HOST_PORT}:8000
-    command: > 
-      sh -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-
-volumes:
-  db_data:
+      - ${MAIN_SERVICE_PORT}:8000
+    environment:
+      - AUTH_SERVICE_HOST = ${AUTH_SERVICE_HOST}
+      - AUTH_SERVICE_PORT = ${AUTH_SERVICE_PORT}

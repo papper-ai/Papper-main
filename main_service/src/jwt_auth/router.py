@@ -14,6 +14,9 @@ router = APIRouter()
     response_model=JWTTokensResponse,
 )
 async def login(jwt_tokens: Annotated[JWTTokensResponse, Depends(authorize_user)]):
+    """
+    На вход подаются данные в виде формы (НЕ JSON)
+    """
     return jwt_tokens
 
 
@@ -21,8 +24,13 @@ async def login(jwt_tokens: Annotated[JWTTokensResponse, Depends(authorize_user)
     "/registration",
     description="register new user",
     dependencies=[Depends(register_user)],
+    status_code=status.HTTP_201_CREATED,
 )
 async def registration():
+    """
+    На вход подаются данные в виде **формы** (НЕ JSON)
+    При успешной регистрации возвращается статус 201
+    """
     return
 
 
@@ -31,5 +39,7 @@ async def registration():
     description="refresh access token via refresh token",
     response_model=JWTTokensResponse,
 )
-async def refresh_tokens(jwt_token: Annotated[JWTRefreshRequest, Depends(get_new_tokens)]):
+async def refresh_tokens(
+    jwt_token: Annotated[JWTRefreshRequest, Depends(get_new_tokens)]
+):
     return jwt_token
