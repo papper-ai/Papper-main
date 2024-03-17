@@ -1,6 +1,6 @@
 from typing import Annotated
 import aiohttp
-from fastapi import Form, HTTPException
+from fastapi import Form, HTTPException, status
 from fastapi.security import HTTPBasicCredentials
 from pydantic import EmailStr, UUID4
 
@@ -36,5 +36,10 @@ async def request_to_auth_service(
     ) as response:
         result = await response.json()
         if response.status != 200:
+            if response.status == 422:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=result["detail"],
+                )
             raise HTTPException(status_code=response.status, detail=result["detail"])
     return result
