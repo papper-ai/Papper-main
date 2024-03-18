@@ -8,7 +8,7 @@ router = APIRouter()
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-@router.get(
+@router.post(
     "/login",
     response_model=JWTTokensResponse,
 )
@@ -22,7 +22,7 @@ async def login(jwt_tokens: Annotated[JWTTokensResponse, Depends(authorize_user)
     return jwt_tokens
 
 
-@router.post(
+@router.get(
     "/registration",
     dependencies=[Depends(register_user)],
     status_code=status.HTTP_201_CREATED,
@@ -35,7 +35,7 @@ async def registration():
     return
 
 
-@router.get(
+@router.post(
     "/refresh_access_token",
     response_model=JWTTokensResponse,
 )
