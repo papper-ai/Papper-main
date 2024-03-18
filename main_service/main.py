@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import aiohttp
 from contextlib import asynccontextmanager
 from main_service.src import router as services_router
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 
@@ -12,6 +13,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(services_router)
 
 if __name__ == "__main__":
