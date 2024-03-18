@@ -20,7 +20,7 @@ class JWTTokensResponse(BaseModel):
 
 
 class Credentials(BaseModel):
-    login: EmailStr
+    login: str
     password: str
 
 

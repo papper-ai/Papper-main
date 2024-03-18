@@ -6,9 +6,17 @@ services:
     build: main_service/.
 #    volumes:
 #      - .:/usr/data/app
+    networks:
+      - papper-backend
     ports:
       - ${MAIN_SERVICE_PORT}:8000
     restart: unless-stopped
     environment:
-      - AUTH_SERVICE_HOST = ${AUTH_SERVICE_HOST}
-      - AUTH_SERVICE_PORT = ${AUTH_SERVICE_PORT}
+      - AUTH_SERVICE_HOST=${AUTH_SERVICE_HOST}
+      - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT}
+
+
+networks:
+  papper-backend:
+    name: papper-backend
+    external: true

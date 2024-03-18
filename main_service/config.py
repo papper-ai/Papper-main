@@ -5,7 +5,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 import os
 
-load_dotenv(Path(__file__).parent.parent / ".env")
+dot_env_path = Path(__file__).parent.parent / ".env"
+
+if dot_env_path.exists():
+    load_dotenv(dot_env_path)
 
 BASE_DIR = Path(__file__).parent
 AUTH_SERVICE_HOST = os.getenv("AUTH_SERVICE_HOST")
