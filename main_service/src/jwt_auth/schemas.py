@@ -1,14 +1,31 @@
 from pydantic import BaseModel, EmailStr, Field, UUID4
 
 
+class Token(BaseModel):
+    token: str
+    token_type: str = Field(default="bearer")
+
+
+class AccessToken(Token):
+    pass
+
+
+class RefreshToken(Token):
+    pass
+
+
 class JWTTokensResponse(BaseModel):
-    access_token: str
-    refresh_token: str
+    access_token: AccessToken
+    refresh_token: RefreshToken
 
 
 class Credentials(BaseModel):
     login: EmailStr
     password: str
+
+
+class AuthCredentials(Credentials):
+    pass
 
 
 class RegistrationCredentials(Credentials):

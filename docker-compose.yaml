@@ -4,10 +4,11 @@ services:
   main_service:
     container_name: main_service
     build: main_service/.
-    volumes:
-      - .:/usr/data/app
+#    volumes:
+#      - .:/usr/data/app
     ports:
       - ${MAIN_SERVICE_PORT}:8000
+    restart: unless-stopped
     environment:
       - AUTH_SERVICE_HOST = ${AUTH_SERVICE_HOST}
       - AUTH_SERVICE_PORT = ${AUTH_SERVICE_PORT}

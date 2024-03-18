@@ -1,66 +1,72 @@
+import aiohttp
 from fastapi.security import (
-    HTTPBasic,
-    HTTPBasicCredentials,
     HTTPBearer,
     HTTPAuthorizationCredentials,
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm,
 )
 from fastapi import Depends, Request
 from typing import Annotated
-from .utils import make_credentials, request_to_auth_service
-from main_service.src.jwt_auth.schemas import (
+from .utils import (
+    make_registration_credentials,
+    request_to_auth_service,
+    create_response_with_tokens,
+    make_auth_credentials,
+)
+from .schemas import (
     JWTTokensResponse,
     RegistrationCredentials,
     JWTRefreshRequest,
+    AuthCredentials,
 )
 from .auth_endpoints import auth_endpoints
 
-security = HTTPBasic()
 http_bearer = HTTPBearer()
 
 
-async def authorize_user(
-    basic_auth_credentials: Annotated[HTTPBasicCredentials, Depends(security)],
-    request: Request,
-) -> JWTTokensResponse:
-    client_session = request.state.client_session
+async def get_aiohttp_session(request: Request) -> aiohttp.ClientSession:
+    return request.state.client_session
 
-    response = await request_to_auth_service(
-        endpoint=auth_endpoints.login,
-        client_session=client_session,
-        schema=basic_auth_credentials,
-    )
-    tokens = JWTTokensResponse(**response)
+
+async def authorize_user(
+    auth_credentials: Annotated[
+        AuthCredentials,
+        Depends(make_auth_credentials),
+    ],
+    client_session: Annotated[
+        aiohttp.ClientSession,
+        Depends(get_aiohttp_session),
+    ],
+) -> JWTTokensResponse:
+    response = await request_to_auth_service(endpoint=auth_endpoints.login, session=client_session,
+                                             schema=auth_credentials)
+    tokens = await create_response_with_tokens(response=response)
     return tokens
 
 
 async def register_user(
     registration_credentials: Annotated[
         RegistrationCredentials,
-        Depends(make_credentials),
+        Depends(make_registration_credentials),
     ],
-    request: Request,
+    client_session: Annotated[
+        aiohttp.ClientSession,
+        Depends(get_aiohttp_session),
+    ],
 ) -> None:
-    client_session = request.state.client_session
-
-    await request_to_auth_service(
-        endpoint=auth_endpoints.registration,
-        client_session=client_session,
-        schema=registration_credentials,
-    )
+    await request_to_auth_service(endpoint=auth_endpoints.registration, session=client_session,
+                                  schema=registration_credentials)
     return
 
 
 async def get_new_tokens(
-    token_auth_credentials: Annotated[
-        HTTPAuthorizationCredentials, Depends(http_bearer)
+    token_credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+    client_session: Annotated[
+        aiohttp.ClientSession,
+        Depends(get_aiohttp_session),
     ],
-    request: Request,
 ) -> JWTTokensResponse:
-    client_session = request.state.client_session
-    token = JWTRefreshRequest(refresh_token=token_auth_credentials.credentials)
-
-    response = await request_to_auth_service(
-        endpoint=auth_endpoints.refresh, client_session=client_session, schema=token
-    )
-    tokens = JWTTokensResponse(**response)
+    token = JWTRefreshRequest(refresh_token=token_credentials.credentials)
+    response = await request_to_auth_service(endpoint=auth_endpoints.refresh, session=client_session, schema=token)
+    tokens = await create_response_with_tokens(response=response)
     return tokens

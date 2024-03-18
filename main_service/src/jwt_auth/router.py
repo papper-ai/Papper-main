@@ -10,25 +10,26 @@ router = APIRouter()
 
 @router.get(
     "/login",
-    description="login with particular user",
     response_model=JWTTokensResponse,
 )
 async def login(jwt_tokens: Annotated[JWTTokensResponse, Depends(authorize_user)]):
     """
-    На вход подаются данные в виде формы (НЕ JSON)
+    На вход подаются данные в виде HTML формы, **подаете только логин и пароль**
+
+    При успешной регистрации возвращаются 2 токена: access и refresh
+    Находиться они будут либо в теле, либо в Header - пока думаем
     """
     return jwt_tokens
 
 
 @router.post(
     "/registration",
-    description="register new user",
     dependencies=[Depends(register_user)],
     status_code=status.HTTP_201_CREATED,
 )
 async def registration():
     """
-    На вход подаются данные в виде **формы** (НЕ JSON)
+    На вход подаются данные в виде HTML **формы** (НЕ JSON)
     При успешной регистрации возвращается статус 201
     """
     return
@@ -36,10 +37,15 @@ async def registration():
 
 @router.get(
     "/refresh_access_token",
-    description="refresh access token via refresh token",
     response_model=JWTTokensResponse,
 )
 async def refresh_tokens(
     jwt_token: Annotated[JWTRefreshRequest, Depends(get_new_tokens)]
 ):
+    """
+    На вход приходит refresh токен в заголовке `Authorization: Bearer <token>`
+
+    При успешном обновлении токенов возвращаются 2 токена: access и refresh.
+    Находиться они будут либо в теле, либо в Authorization: Bearer <token>, Bearer <token> - пока думаем
+    """
     return jwt_token

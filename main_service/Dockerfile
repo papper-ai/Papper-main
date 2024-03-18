@@ -11,7 +11,7 @@ RUN apt-get update && \
     pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements/base.txt && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* \
+    rm -rf /var/lib/apt/lists/* && \
     rm -r requirements
 
 COPY --chown=papperuser:papperuser . main_service/
