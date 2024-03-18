@@ -17,7 +17,7 @@ async def login(jwt_tokens: Annotated[JWTTokensResponse, Depends(authorize_user)
     На вход подаются данные в виде HTML формы, **подаете только логин и пароль**
 
     При успешной регистрации возвращаются 2 токена: access и refresh
-    Находиться они будут либо в теле, либо в Header - пока думаем
+    Находиться они будут либо в теле
     """
     return jwt_tokens
 
@@ -46,6 +46,6 @@ async def refresh_tokens(
     На вход приходит refresh токен в заголовке `Authorization: Bearer <token>`
 
     При успешном обновлении токенов возвращаются 2 токена: access и refresh.
-    Находиться они будут либо в теле, либо в Authorization: Bearer <token>, Bearer <token> - пока думаем
+    Находиться они будут либо в теле
     """
     return jwt_token
