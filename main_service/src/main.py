@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import aiohttp
 from contextlib import asynccontextmanager
-from auth_service import auth_router
+from auth_service.api import auth_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 

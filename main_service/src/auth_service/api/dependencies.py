@@ -7,19 +7,19 @@ from fastapi.security import (
 )
 from fastapi import Depends, Request
 from typing import Annotated
-from .utils import (
+from main_service.src.auth_service.utils import (
     make_registration_credentials,
     request_to_auth_service,
     create_response_with_tokens,
     make_auth_credentials,
 )
-from .schemas import (
+from main_service.src.auth_service.schemas import (
     JWTTokensResponse,
     RegistrationCredentials,
     JWTRefreshRequest,
     AuthCredentials,
 )
-from .external_endpoints import auth_endpoints
+from main_service.src.auth_service.external_endpoints import auth_endpoints
 
 http_bearer = HTTPBearer()
 
