@@ -3,7 +3,7 @@ from typing import Annotated
 from .schemas import JWTTokensResponse, JWTRefreshRequest
 from .dependencies import authorize_user, register_user, get_new_tokens
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

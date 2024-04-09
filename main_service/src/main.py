@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import aiohttp
 from contextlib import asynccontextmanager
-from main_service.src import router as services_router
+from auth_service import auth_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(services_router)
+app.include_router(auth_router)
 
 if __name__ == "__main__":
     uvicorn.run("main_service.main:app", host="0.0.0.0", port=8001, reload=True)

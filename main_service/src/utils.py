@@ -1,6 +1,6 @@
 import jwt
 import asyncio
-from config import settings
+from main_service.src.config import settings
 
 
 async def decode_jwt(
