@@ -22,7 +22,7 @@ async def login(jwt_tokens: Annotated[JWTTokensResponse, Depends(authorize_user)
     return jwt_tokens
 
 
-@router.get(
+@router.post(
     "/registration",
     dependencies=[Depends(register_user)],
     status_code=status.HTTP_201_CREATED,

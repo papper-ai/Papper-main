@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from main_service.src.config import settings
+from .config import settings
 
 AUTH_SERVICE_URL = settings.auth_service_url
 

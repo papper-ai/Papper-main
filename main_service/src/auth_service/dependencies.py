@@ -19,7 +19,7 @@ from .schemas import (
     JWTRefreshRequest,
     AuthCredentials,
 )
-from .auth_endpoints import auth_endpoints
+from .external_endpoints import auth_endpoints
 
 http_bearer = HTTPBearer()
 
