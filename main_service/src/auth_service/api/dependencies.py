@@ -2,8 +2,6 @@ import aiohttp
 from fastapi.security import (
     HTTPBearer,
     HTTPAuthorizationCredentials,
-    OAuth2PasswordBearer,
-    OAuth2PasswordRequestForm,
 )
 from fastapi import Depends, Request
 from typing import Annotated
@@ -20,12 +18,9 @@ from main_service.src.auth_service.schemas import (
     AuthCredentials,
 )
 from main_service.src.auth_service.external_endpoints import auth_endpoints
+from main_service.src.utils import get_aiohttp_session
 
 http_bearer = HTTPBearer()
-
-
-async def get_aiohttp_session(request: Request) -> aiohttp.ClientSession:
-    return request.state.client_session
 
 
 async def authorize_user(
@@ -64,15 +59,14 @@ async def register_user(
 
 
 async def get_new_tokens(
-    token_credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+    refresh_token: JWTRefreshRequest,
     client_session: Annotated[
         aiohttp.ClientSession,
         Depends(get_aiohttp_session),
     ],
 ) -> JWTTokensResponse:
-    token = JWTRefreshRequest(refresh_token=token_credentials.credentials)
     response = await request_to_auth_service(
-        endpoint=auth_endpoints.refresh, session=client_session, schema=token
+        endpoint=auth_endpoints.refresh, session=client_session, schema=refresh_token
     )
     tokens = await create_response_with_tokens(response=response)
     return tokens

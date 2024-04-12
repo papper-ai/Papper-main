@@ -46,7 +46,7 @@ async def refresh_tokens(
     jwt_tokens: Annotated[JWTRefreshRequest, Depends(get_new_tokens)]
 ):
     """
-    На вход приходит refresh токен в заголовке `Authorization: Bearer <token>`.
+    На вход приходит refresh токен в теле запроса.
     При успешном обновлении возвращаются 2 токена: access и refresh.
     """
     return jwt_tokens
