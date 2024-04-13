@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import aiohttp
 from contextlib import asynccontextmanager
 from auth_service.api import auth_router
+from vault_service.api import vault_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(vault_router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="localhost", port=8000)

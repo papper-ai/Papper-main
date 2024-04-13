@@ -1,6 +1,9 @@
-from pydantic import BaseModel
+from datetime import date
+
+from pydantic import BaseModel, UUID4, ConfigDict
 
 
 class JWTPayload(BaseModel):
-    sub: str
-    exp: int
+    model_config = ConfigDict(from_attributes=True)
+    user_id: UUID4
+    exp: date

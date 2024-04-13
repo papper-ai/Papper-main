@@ -7,7 +7,7 @@ from main_service.src.auth_service.api.dependencies import (
     get_new_tokens,
 )
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Authorization"])
 
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

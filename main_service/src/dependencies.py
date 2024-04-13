@@ -1,0 +1,21 @@
+from fastapi import Request, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import aiohttp
+from typing_extensions import Annotated
+from utils import decode_jwt
+from schemas import JWTPayload
+
+http_bearer = HTTPBearer()
+
+
+async def get_aiohttp_session(request: Request) -> aiohttp.ClientSession:
+    return request.state.client_session
+
+
+async def parse_jwt(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+) -> None:
+    token = credentials.credentials
+    dict_payload = await decode_jwt(token=token)
+    payload = JWTPayload.model_validate(dict_payload)
+    print(payload)
