@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from typing import Annotated
-from main_service.src.auth_service.schemas import JWTTokensResponse, JWTRefreshRequest
-from main_service.src.auth_service.api.dependencies import (
+from ..schemas import JWTTokensResponse, JWTRefreshRequest
+from .dependencies import (
     authorize_user,
     register_user,
     get_new_tokens,

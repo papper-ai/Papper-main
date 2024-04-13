@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Body, Form, UploadFile, Depends, File
 from typing import List
 from typing_extensions import Annotated
-from ..schemas import Bibki
-from dependencies import parse_jwt
+from src.vault_service.schemas import Bibki
+from src.dependencies import parse_jwt
 
 router = APIRouter(prefix="/vault", tags=["Documents & Vaults"])
 
