@@ -17,10 +17,16 @@ async def request_to_auth_service(
                 raise HTTPException(
                     status_code=response.status, detail=result["detail"]
                 )
-    except Exception as e:
-        logging.error(e)
+    except aiohttp.ClientConnectionError as connect_error:
+        logging.error(connect_error)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Auth service is not available now",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The authorization service is temporarily unable to handle the request.",
+        )
+    except aiohttp.ContentTypeError as content_error:
+        logging.error(content_error)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="The authorization service responded with an invalid content type.",
         )
     return result

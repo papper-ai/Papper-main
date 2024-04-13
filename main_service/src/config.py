@@ -16,7 +16,6 @@ class JWTAuth(BaseModel):
 
 class Setting(BaseSettings):
     model_config = SettingsConfigDict(env_file=BASE_DIR.parent / ".env", extra="ignore")
-
     jwt_auth: JWTAuth = JWTAuth()
 
 

@@ -8,7 +8,6 @@ from .dependencies import (
 )
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
-
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
