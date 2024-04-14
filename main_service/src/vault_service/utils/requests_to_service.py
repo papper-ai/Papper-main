@@ -12,6 +12,7 @@ async def create_vault_request(
 ) -> VaultResponse:
     headers = {"accept": "application/json"}
     json_data = schema.model_dump_json()
+
     form = aiohttp.FormData()
     form.add_field("create_vault_request", json_data, content_type="application/json")
     for file in files:
@@ -19,6 +20,7 @@ async def create_vault_request(
         form.add_field(
             "files", file_bytes, filename=file.filename, content_type=file.content_type
         )
+
     try:
         async with session.post(url=endpoint, headers=headers, data=form) as response:
             result = await response.json()

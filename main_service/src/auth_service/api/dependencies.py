@@ -5,7 +5,7 @@ from fastapi.security import (
 )
 from fastapi import Depends, Request
 from typing import Annotated
-from src.auth_service.utils import (
+from ..utils import (
     make_registration_credentials,
     request_to_auth_service,
     create_response_with_tokens,

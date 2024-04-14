@@ -2,7 +2,7 @@ from fastapi import Request, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import aiohttp
 from typing_extensions import Annotated
-from utils import decode_jwt
+from src.utils import decode_jwt
 from src.schemas import JWTPayload
 
 http_bearer = HTTPBearer()

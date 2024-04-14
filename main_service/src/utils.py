@@ -2,7 +2,7 @@ import jwt
 import asyncio
 from fastapi import Request, HTTPException, status
 import aiohttp
-from main_service.src.config import settings
+from src.config import settings
 import functools
 
 

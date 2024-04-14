@@ -16,8 +16,8 @@ RUN apt-get update && \
 
 COPY --chown=papperuser:papperuser . main_service/
 
-ENV PYTHONPATH=/usr/data/app/main_service/src
+ENV PYTHONPATH=/usr/data/app/main_service
 
 USER papperuser
 
-ENTRYPOINT ["uvicorn", "main_service.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

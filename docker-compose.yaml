@@ -11,9 +11,9 @@ services:
     ports:
       - ${MAIN_SERVICE_PORT}:8000
     restart: unless-stopped
-    environment:
-      - AUTH_SERVICE_HOST=${AUTH_SERVICE_HOST}
-      - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT}
+    env_file:
+      - main_service/src/auth_service/.env
+      - main_service/src/vault_service/.env
 
 
 networks:
