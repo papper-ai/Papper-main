@@ -20,4 +20,4 @@ ENV PYTHONPATH=/usr/data/app/main_service
 
 USER papperuser
 
-ENTRYPOINT ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
