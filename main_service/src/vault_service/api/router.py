@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Form, UploadFile, Depends, File
+from fastapi import APIRouter, Form, UploadFile, Depends, status
 from typing import List
 from typing_extensions import Annotated
 from ..schemas import VaultCredentials, CreateVault, VaultResponse
@@ -11,7 +11,7 @@ from ..external_endpoints import vault_endpoints
 router = APIRouter(prefix="/vault", tags=["Documents & Vaults"])
 
 
-@router.post("/create_vault", response_model=VaultResponse)
+@router.post("/create_vault", response_model=VaultResponse, status_code=status.HTTP_201_CREATED, description="Create a new vault")
 async def create_vaults(
     token_payload: Annotated[JWTPayload, Depends(parse_jwt)],
     vault_credentials: Annotated[VaultCredentials, Form()],

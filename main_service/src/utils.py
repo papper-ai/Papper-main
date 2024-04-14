@@ -21,7 +21,7 @@ async def decode_jwt(
         )
     except jwt.exceptions.InvalidSignatureError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token signature"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token signature"
         )
     return payload
 
