@@ -24,7 +24,7 @@ async def create_vault_request(
     try:
         async with session.post(url=endpoint, headers=headers, data=form) as response:
             result = await response.json()
-            if response.status != 200:
+            if response.status >= 400:
                 raise HTTPException(
                     status_code=response.status, detail=result["detail"]
                 )
