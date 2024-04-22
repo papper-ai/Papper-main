@@ -1,8 +1,11 @@
 import json
 from datetime import datetime
 from enum import Enum
+from typing import Annotated
+from uuid import uuid4
+
 from fastapi import UploadFile
-from pydantic import BaseModel, UUID4, ConfigDict, model_validator
+from pydantic import BaseModel, UUID4, ConfigDict, model_validator, Field
 
 
 class VaultType(str, Enum):
@@ -39,3 +42,8 @@ class VaultResponse(BaseVault):
     type: VaultType
     created_at: datetime
     user_id: UUID4
+
+
+class UpdateVault(BaseModel):
+    vault_id: UUID4 = Field(default="68f7a831769442baae77c7de4974b67f")
+    new_name: str
