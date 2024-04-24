@@ -11,7 +11,9 @@ async def request_to_auth_service(
     schema: RegistrationCredentials | JWTRefreshRequest | AuthCredentials,
 ) -> dict:
     try:
-        async with session.post(url=endpoint, json=schema.model_dump()) as response:
+        async with session.post(
+            url=endpoint, json=schema.model_dump_json()
+        ) as response:
             result = await response.json()
             if response.status >= 400:
                 raise HTTPException(
