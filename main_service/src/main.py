@@ -13,7 +13,7 @@ async def lifespan(app: FastAPI):
         yield {"client_session": session}
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, title="Papper API", version="0.0.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +25,12 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(vault_router)
+
+
+@app.get("/")
+async def hello():
+    return {"message": "Hello from main service!"}
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000)
