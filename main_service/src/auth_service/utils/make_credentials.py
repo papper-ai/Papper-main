@@ -1,3 +1,5 @@
+import json
+
 from fastapi import Form, HTTPException, status
 from pydantic import UUID4
 from typing_extensions import Annotated
@@ -20,7 +22,7 @@ async def make_auth_credentials(
     except ValidationError as validation_error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=validation_error.json(),
+            detail=json.dumps(validation_error.json()),
         )
     return credentials
 
