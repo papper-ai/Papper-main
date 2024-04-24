@@ -20,7 +20,7 @@ async def make_auth_credentials(
     except ValidationError as validation_error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(validation_error),
+            detail=validation_error.json(),
         )
     return credentials
 
@@ -43,6 +43,6 @@ async def make_registration_credentials(
     except ValidationError as validation_error:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(validation_error),
+            detail=validation_error.json(),
         )
     return credentials
