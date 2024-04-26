@@ -124,7 +124,7 @@ async def get_vault_documents(
 @router.get(
     "/get_user_vaults",
     response_model=list[VaultCredentials],
-    description="Получение списка хранилищ, созданных пользователем. Данные извлекаются из токена!",
+    description="Получение списка хранилищ, созданных пользователем. **Данные извлекаются из токена!**",
 )
 async def get_users_vaults(
     token_payload: Annotated[JWTPayload, Depends(parse_jwt)],
