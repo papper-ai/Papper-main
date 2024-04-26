@@ -34,7 +34,9 @@ async def authorize_user(
     ],
 ) -> JWTTokensResponse:
     response = await request_to_auth_service(
-        endpoint=auth_endpoints.login, session=client_session, schema=auth_credentials
+        endpoint=auth_endpoints.login,
+        session=client_session,
+        pydantic_model=auth_credentials,
     )
     tokens = await create_response_with_tokens(response=response)
     return tokens
@@ -53,7 +55,7 @@ async def register_user(
     await request_to_auth_service(
         endpoint=auth_endpoints.registration,
         session=client_session,
-        schema=registration_credentials,
+        pydantic_model=registration_credentials,
     )
     return
 
@@ -66,7 +68,9 @@ async def get_new_tokens(
     ],
 ) -> JWTTokensResponse:
     response = await request_to_auth_service(
-        endpoint=auth_endpoints.refresh, session=client_session, schema=refresh_token
+        endpoint=auth_endpoints.refresh,
+        session=client_session,
+        pydantic_model=refresh_token,
     )
     tokens = await create_response_with_tokens(response=response)
     return tokens

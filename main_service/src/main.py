@@ -33,4 +33,9 @@ async def hello():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="localhost", port=8000)
+    uvicorn.run(
+        "main:app",
+        host="localhost",
+        port=8000,
+        log_config="./uvicorn-logging-config.yaml",
+    )

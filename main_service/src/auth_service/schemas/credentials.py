@@ -4,9 +4,8 @@ from fastapi import HTTPException, status
 import re
 
 
-class Credentials(BaseModel):
-    login: Annotated[str, Field(min_length=3, max_length=32)]
-    password: Annotated[str, Field(min_length=8, max_length=20)]
+class BaseCredentials(BaseModel):
+    password: str
 
     @field_validator("password")
     @classmethod
@@ -20,11 +19,14 @@ class Credentials(BaseModel):
         return value
 
 
-class AuthCredentials(Credentials):
-    pass
+class AuthCredentials(BaseCredentials):
+    login: str
+    password: str
 
 
-class RegistrationCredentials(Credentials):
+class RegistrationCredentials(BaseCredentials):
     secret: UUID4
-    name: Annotated[str, Field(min_length=3, max_length=32)]
-    surname: Annotated[str, Field(min_length=3, max_length=32)]
+    name: str
+    surname: str
+    login: str
+    password: str

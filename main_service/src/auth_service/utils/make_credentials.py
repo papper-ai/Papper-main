@@ -10,8 +10,8 @@ from pydantic import ValidationError
 
 
 async def make_auth_credentials(
-    login: Annotated[str, Form()],
-    password: Annotated[str, Form()],
+    login: Annotated[str, Form(min_length=3, max_length=32)],
+    password: Annotated[str, Form(min_length=8, max_length=20)],
 ) -> AuthCredentials:
     try:
         credentials = AuthCredentials(
@@ -28,14 +28,14 @@ async def make_auth_credentials(
 
 async def make_registration_credentials(
     secret: Annotated[UUID4, Form()],
-    name: Annotated[str, Form()],
-    surname: Annotated[str, Form()],
-    login: Annotated[str, Form()],
-    password: Annotated[str, Form()],
+    name: Annotated[str, Form(min_length=3, max_length=32)],
+    surname: Annotated[str, Form(min_length=3, max_length=32)],
+    login: Annotated[str, Form(min_length=3, max_length=32)],
+    password: Annotated[str, Form(min_length=8, max_length=20)],
 ) -> RegistrationCredentials:
     try:
         credentials = RegistrationCredentials(
-            secret=secret,
+            secret=secret.hex,
             name=name,
             surname=surname,
             login=login,
