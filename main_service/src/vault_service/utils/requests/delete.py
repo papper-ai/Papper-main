@@ -1,5 +1,5 @@
 import aiohttp
-from ...schemas.vault import DeleteVaultRequest
+from ...schemas.vault import DeleteVaultRequest, DeleteDocumentRequest
 from fastapi import HTTPException
 from src.utils import aiohttp_error_handler
 
@@ -9,6 +9,22 @@ async def delete_vault_request(
     endpoint: str,
     session: aiohttp.ClientSession,
     pydantic_model: DeleteVaultRequest,
+) -> None:
+    json_data = pydantic_model.model_dump(mode="json")
+
+    async with session.delete(url=endpoint, json=json_data) as response:
+        result = await response.json()
+        if response.status >= 400:
+            raise HTTPException(status_code=response.status, detail=result["detail"])
+
+    return
+
+
+@aiohttp_error_handler(service_name="Vault")
+async def delete_document_request(
+    endpoint: str,
+    session: aiohttp.ClientSession,
+    pydantic_model: DeleteDocumentRequest,
 ) -> None:
     json_data = pydantic_model.model_dump(mode="json")
 

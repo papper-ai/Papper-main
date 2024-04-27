@@ -50,7 +50,7 @@ async def get_user_vaults_request(
     result = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model
     )
-
+    print(result)
     return result
 
 

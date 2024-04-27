@@ -3,11 +3,14 @@ from typing import List
 from typing_extensions import Annotated
 from ..schemas.vault import (
     VaultCredentials,
+    AddDocumentRequest,
+    PreviewVaultCredentials,
     CreateVault,
     CreateVaultRequest,
     CreateVaultResponse,
     UpdateVaultRequest,
     DeleteVaultRequest,
+    DeleteDocumentRequest,
     UpdateVault,
     GetVaultDocumentsRequest,
     GetUserVaultsRequest,
@@ -19,8 +22,10 @@ from src.dependencies import parse_jwt, get_aiohttp_session
 from src.schemas import JWTPayload
 from ..utils.requests import (
     create_vault_request,
+    add_document_request,
     update_vault_name_request,
     delete_vault_request,
+    delete_document_request,
     get_vault_documents_request,
     get_user_vaults_request,
     get_vault_request,
@@ -58,6 +63,28 @@ async def create_vaults(
     return response
 
 
+@router.post(
+    "/upload_document",
+    dependencies=[Depends(parse_jwt)],
+    status_code=status.HTTP_201_CREATED,
+    response_model=VaultCredentials,
+    description="Загрузка нового документа в существующее хранилище",
+)
+async def upload_document(
+    vault_id: Annotated[UUID4, Form()],
+    file: UploadFile,
+    client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+) -> VaultCredentials:
+
+    results = await add_document_request(
+        endpoint=vault_endpoints.add_document,
+        session=client_session,
+        pydantic_model=AddDocumentRequest(vault_id=vault_id),
+        file=file,
+    )
+    return results
+
+
 @router.delete(
     "/delete_vault/{vault_id}",
     dependencies=[Depends(parse_jwt)],
@@ -72,6 +99,29 @@ async def delete_vault(
         endpoint=vault_endpoints.delete_vault,
         session=client_session,
         pydantic_model=DeleteVaultRequest(vault_id=vault_id),
+    )
+
+    return
+
+
+@router.delete(
+    "/delete_document/{vault_id}/{document_id}",
+    dependencies=[Depends(parse_jwt)],
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Удаление документа из хранилища",
+)
+async def delete_document(
+    client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    vault_id: UUID4,
+    document_id: UUID4,
+) -> None:
+
+    await delete_document_request(
+        endpoint=vault_endpoints.delete_document,
+        session=client_session,
+        pydantic_model=DeleteDocumentRequest(
+            vault_id=vault_id, document_id=document_id
+        ),
     )
 
     return
@@ -123,7 +173,7 @@ async def get_vault_documents(
 
 @router.get(
     "/get_user_vaults",
-    response_model=list[VaultCredentials],
+    response_model=list[PreviewVaultCredentials],
     description="Получение списка хранилищ, созданных пользователем. **Данные извлекаются из токена!**",
 )
 async def get_users_vaults(
