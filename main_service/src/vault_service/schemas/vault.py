@@ -2,9 +2,7 @@ import json
 from datetime import datetime
 from enum import Enum
 from typing import Annotated
-from uuid import uuid4
 from .document import Document
-from fastapi import UploadFile
 from pydantic import BaseModel, UUID4, ConfigDict, model_validator, Field
 
 
@@ -32,61 +30,33 @@ class CreateVaultRequest(BaseModel):
     vault_type: VaultType
 
 
-class BaseVaultRequest(BaseModel):
-    vault_id: UUID4 = Field(default="d5c2450f-5d6d-4f45-987c-33b1111b9c8c")
-
-
-class BaseVaultCredentials(BaseModel):
+class BaseVaultPayload(BaseModel):
     id: UUID4
     name: str
     type: VaultType
 
 
-class PreviewVaultCredentials(BaseVaultCredentials):
+class VaultPayloadPreview(BaseVaultPayload):
     pass
 
 
-class VaultCredentials(BaseVaultCredentials):
+class VaultPayload(BaseVaultPayload):
     created_at: datetime
     user_id: UUID4
     documents: list[Document]
 
 
-class CreateVaultResponse(VaultCredentials):
-    pass
-
-
-class AddDocumentRequest(BaseVaultRequest):
-    pass
-
-
-class UpdateVault(BaseVaultRequest):
-    new_name: str
-
-
-class UpdateVaultRequest(BaseVaultRequest):
-    name: str
-
-
-class DeleteVaultRequest(BaseVaultRequest):
-    pass
-
-
-class DeleteDocumentRequest(BaseVaultRequest):
-    document_id: UUID4 = Field(default="d7a2476a1b9a4232b0475cbd4c250bf6")
-
-
-class GetVaultDocumentsRequest(BaseVaultRequest):
-    pass
-
-
-class GetVaultRequest(BaseVaultRequest):
-    pass
-
-
-class GetDocumentRequest(BaseModel):
-    document_id: UUID4
-
-
-class GetUserVaultsRequest(BaseModel):
+class UserCredentials(BaseModel):
     user_id: UUID4
+
+
+class VaultCredentials(BaseModel):
+    vault_id: UUID4 = Field(default="d5c2450f-5d6d-4f45-987c-33b1111b9c8c")
+
+
+class DocumentCredentials(VaultCredentials):
+    document_id: UUID4 = Field(default="d5c2450f-5d6d-4f45-987c-33b1111b9c8c")
+
+
+class UpdateVault(VaultCredentials):
+    new_name: Annotated[str, Field(alias="name", max_length=100)]

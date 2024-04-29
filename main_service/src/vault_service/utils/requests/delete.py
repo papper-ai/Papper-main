@@ -1,14 +1,15 @@
 import aiohttp
-from ...schemas.vault import DeleteVaultRequest, DeleteDocumentRequest
+from ...schemas.vault import VaultCredentials, DocumentCredentials
 from fastapi import HTTPException
 from src.utils import aiohttp_error_handler
+from ...external_endpoints import vault_endpoints
 
 
 @aiohttp_error_handler(service_name="Vault")
 async def delete_vault_request(
-    endpoint: str,
     session: aiohttp.ClientSession,
-    pydantic_model: DeleteVaultRequest,
+    pydantic_model: VaultCredentials,
+    endpoint: str = vault_endpoints.delete_vault,
 ) -> None:
     json_data = pydantic_model.model_dump(mode="json")
 
@@ -22,9 +23,9 @@ async def delete_vault_request(
 
 @aiohttp_error_handler(service_name="Vault")
 async def delete_document_request(
-    endpoint: str,
     session: aiohttp.ClientSession,
-    pydantic_model: DeleteDocumentRequest,
+    pydantic_model: DocumentCredentials,
+    endpoint: str = vault_endpoints.delete_document,
 ) -> None:
     json_data = pydantic_model.model_dump(mode="json")
 

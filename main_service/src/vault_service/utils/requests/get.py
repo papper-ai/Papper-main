@@ -3,14 +3,14 @@ from typing import Any
 import aiohttp
 from src.utils import aiohttp_error_handler
 from ...schemas.vault import (
-    GetUserVaultsRequest,
-    GetVaultDocumentsRequest,
+    VaultPayload,
     VaultCredentials,
-    GetVaultRequest,
-    GetDocumentRequest,
+    UserCredentials,
+    DocumentCredentials,
 )
 from ...schemas.document import Document
 from fastapi import HTTPException
+from ...external_endpoints import vault_endpoints
 
 
 async def get_info_from_service(
@@ -30,9 +30,9 @@ async def get_info_from_service(
 
 @aiohttp_error_handler(service_name="Vault")
 async def get_vault_documents_request(
-    endpoint: str,
     session: aiohttp.ClientSession,
-    pydantic_model: GetVaultDocumentsRequest,
+    pydantic_model: VaultCredentials,
+    endpoint: str = vault_endpoints.get_vault_documents,
 ) -> list:
     result = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model
@@ -42,10 +42,10 @@ async def get_vault_documents_request(
 
 
 @aiohttp_error_handler(service_name="Vault")
-async def get_user_vaults_request(
-    endpoint: str,
+async def get_user_vaults_preview_request(
     session: aiohttp.ClientSession,
-    pydantic_model: GetUserVaultsRequest,
+    pydantic_model: UserCredentials,
+    endpoint: str = vault_endpoints.get_users_vaults,
 ) -> list:
     result = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model
@@ -56,17 +56,21 @@ async def get_user_vaults_request(
 
 @aiohttp_error_handler(service_name="Vault")
 async def get_vault_request(
-    endpoint: str, session: aiohttp.ClientSession, pydantic_model: GetVaultRequest
-) -> VaultCredentials:
+    session: aiohttp.ClientSession,
+    pydantic_model: VaultCredentials,
+    endpoint: str = vault_endpoints.get_vault_by_id,
+) -> VaultPayload:
     result: dict = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model
     )
-    return VaultCredentials(**result)
+    return VaultPayload(**result)
 
 
 @aiohttp_error_handler(service_name="Vault")
 async def get_document_request(
-    endpoint: str, session: aiohttp.ClientSession, pydantic_model: GetDocumentRequest
+    session: aiohttp.ClientSession,
+    pydantic_model: DocumentCredentials,
+    endpoint: str = vault_endpoints.get_document_by_id,
 ) -> Document:
     result: dict = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model

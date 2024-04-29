@@ -2,20 +2,14 @@ from fastapi import APIRouter, Form, UploadFile, Depends, status, Body, Path
 from typing import List
 from typing_extensions import Annotated
 from ..schemas.vault import (
-    VaultCredentials,
-    AddDocumentRequest,
-    PreviewVaultCredentials,
+    VaultPayload,
+    VaultPayloadPreview,
     CreateVault,
     CreateVaultRequest,
-    CreateVaultResponse,
-    UpdateVaultRequest,
-    DeleteVaultRequest,
-    DeleteDocumentRequest,
     UpdateVault,
-    GetVaultDocumentsRequest,
-    GetUserVaultsRequest,
-    GetVaultRequest,
-    GetDocumentRequest,
+    VaultCredentials,
+    DocumentCredentials,
+    UserCredentials,
 )
 from ..schemas.document import Document
 from src.dependencies import parse_jwt, get_aiohttp_session
@@ -27,12 +21,11 @@ from ..utils.requests import (
     delete_vault_request,
     delete_document_request,
     get_vault_documents_request,
-    get_user_vaults_request,
+    get_user_vaults_preview_request,
     get_vault_request,
     get_document_request,
 )
 import aiohttp
-from ..external_endpoints import vault_endpoints
 from pydantic import UUID4
 
 router = APIRouter(prefix="/vault", tags=["Documents & Vaults"])
@@ -40,7 +33,7 @@ router = APIRouter(prefix="/vault", tags=["Documents & Vaults"])
 
 @router.post(
     "/create_vault",
-    response_model=CreateVaultResponse,
+    response_model=VaultPayload,
     status_code=status.HTTP_201_CREATED,
     description="Создание нового хранилища документов. Тип хранилища `vector` или `graph`",
 )
@@ -49,13 +42,12 @@ async def create_vaults(
     create_vault_credentials: Annotated[CreateVault, Form()],
     files: List[UploadFile],
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
-) -> CreateVaultResponse:
+) -> VaultPayload:
     create_vault_request_credentials = CreateVaultRequest(
         **create_vault_credentials.model_dump(), user_id=token_payload.user_id
     )
 
     response = await create_vault_request(
-        endpoint=vault_endpoints.create_vault,
         session=client_session,
         pydantic_model=create_vault_request_credentials,
         files=files,
@@ -67,19 +59,18 @@ async def create_vaults(
     "/upload_document",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_201_CREATED,
-    response_model=VaultCredentials,
+    response_model=VaultPayload,
     description="Загрузка нового документа в существующее хранилище",
 )
 async def upload_document(
     vault_id: Annotated[UUID4, Form()],
     file: UploadFile,
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
-) -> VaultCredentials:
+) -> VaultPayload:
 
     results = await add_document_request(
-        endpoint=vault_endpoints.add_document,
         session=client_session,
-        pydantic_model=AddDocumentRequest(vault_id=vault_id),
+        pydantic_model=VaultCredentials(vault_id=vault_id),
         file=file,
     )
     return results
@@ -96,11 +87,9 @@ async def delete_vault(
     vault_id: UUID4,
 ) -> None:
     await delete_vault_request(
-        endpoint=vault_endpoints.delete_vault,
         session=client_session,
-        pydantic_model=DeleteVaultRequest(vault_id=vault_id),
+        pydantic_model=VaultCredentials(vault_id=vault_id),
     )
-
     return
 
 
@@ -117,11 +106,8 @@ async def delete_document(
 ) -> None:
 
     await delete_document_request(
-        endpoint=vault_endpoints.delete_document,
         session=client_session,
-        pydantic_model=DeleteDocumentRequest(
-            vault_id=vault_id, document_id=document_id
-        ),
+        pydantic_model=DocumentCredentials(vault_id=vault_id, document_id=document_id),
     )
 
     return
@@ -137,15 +123,10 @@ async def update_vault_name(
     update_vault_credentials: UpdateVault,
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
 ) -> None:
-    update_vault = UpdateVaultRequest(
-        name=update_vault_credentials.new_name,
-        vault_id=update_vault_credentials.vault_id,
-    )
 
     await update_vault_name_request(
-        endpoint=vault_endpoints.rename_vault,
         session=client_session,
-        pydantic_model=update_vault,
+        pydantic_model=update_vault_credentials,
     )
 
     return
@@ -163,17 +144,16 @@ async def get_vault_documents(
 ) -> list:
 
     response = await get_vault_documents_request(
-        endpoint=vault_endpoints.get_vault_documents,
         session=client_session,
-        pydantic_model=GetVaultDocumentsRequest(vault_id=vault_id),
+        pydantic_model=VaultCredentials(vault_id=vault_id),
     )
 
     return response
 
 
 @router.get(
-    "/get_user_vaults",
-    response_model=list[PreviewVaultCredentials],
+    "/get_user_vaults_preview",
+    response_model=list[VaultPayloadPreview],
     description="Получение списка хранилищ, созданных пользователем. **Данные извлекаются из токена!**",
 )
 async def get_users_vaults(
@@ -181,10 +161,9 @@ async def get_users_vaults(
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
 ) -> list:
 
-    response = await get_user_vaults_request(
-        endpoint=vault_endpoints.get_users_vaults,
+    response = await get_user_vaults_preview_request(
         session=client_session,
-        pydantic_model=GetUserVaultsRequest(user_id=token_payload.user_id),
+        pydantic_model=UserCredentials(user_id=token_payload.user_id),
     )
 
     return response
@@ -193,17 +172,16 @@ async def get_users_vaults(
 @router.get(
     "/get_vault/{vault_id}",
     dependencies=[Depends(parse_jwt)],
-    response_model=VaultCredentials,
+    response_model=VaultPayload,
     description="Получение метаданных хранилища.",
 )
 async def get_vault(
     vault_id: UUID4,
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
-) -> VaultCredentials:
+) -> VaultPayload:
     response = await get_vault_request(
-        endpoint=vault_endpoints.get_vault_by_id,
         session=client_session,
-        pydantic_model=GetVaultRequest(vault_id=vault_id),
+        pydantic_model=VaultCredentials(vault_id=vault_id),
     )
     return response
 
@@ -219,8 +197,7 @@ async def get_document(
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
 ) -> Document:
     response = await get_document_request(
-        endpoint=vault_endpoints.get_document_by_id,
         session=client_session,
-        pydantic_model=GetDocumentRequest(document_id=document_id),
+        pydantic_model=DocumentCredentials(document_id=document_id),
     )
     return response

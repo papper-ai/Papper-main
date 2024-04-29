@@ -1,17 +1,18 @@
 import aiohttp
-from ...schemas.vault import CreateVaultRequest, CreateVaultResponse
+from ...schemas.vault import CreateVaultRequest, VaultPayload
 from ...schemas.document import Document
 from fastapi import UploadFile, HTTPException
 from src.utils import aiohttp_error_handler
+from ...external_endpoints import vault_endpoints
 
 
 @aiohttp_error_handler(service_name="Vault")
 async def create_vault_request(
-    endpoint: str,
     session: aiohttp.ClientSession,
     pydantic_model: CreateVaultRequest,
     files: list[UploadFile],
-) -> CreateVaultResponse:
+    endpoint: str = vault_endpoints.create_vault,
+) -> VaultPayload:
     headers = {"accept": "application/json"}
     json_data = pydantic_model.model_dump_json()
 
@@ -28,4 +29,4 @@ async def create_vault_request(
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
 
-    return CreateVaultResponse(**result)
+    return VaultPayload(**result)
