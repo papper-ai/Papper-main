@@ -154,7 +154,7 @@ async def get_vault_documents(
 @router.get(
     "/get_user_vaults_preview",
     response_model=list[VaultPayloadPreview],
-    description="Получение списка хранилищ, созданных пользователем. **Данные извлекаются из токена!**",
+    description="Получение превью списка хранилищ, созданных пользователем. **Данные извлекаются из токена!**",
 )
 async def get_users_vaults(
     token_payload: Annotated[JWTPayload, Depends(parse_jwt)],
@@ -173,7 +173,7 @@ async def get_users_vaults(
     "/get_vault/{vault_id}",
     dependencies=[Depends(parse_jwt)],
     response_model=VaultPayload,
-    description="Получение метаданных хранилища.",
+    description="Получение **ВСЕХ** данных о хранилище.",
 )
 async def get_vault(
     vault_id: UUID4,
@@ -190,7 +190,7 @@ async def get_vault(
     "/get_document/{document_id}",
     dependencies=[Depends(parse_jwt)],
     response_model=Document,
-    description="Получение метаданных документа из хранилища.",
+    description="Получение **ВСЕХ** о определенном документе из хранилища.",
 )
 async def get_document(
     document_id: UUID4,

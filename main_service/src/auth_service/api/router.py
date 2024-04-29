@@ -1,13 +1,17 @@
 from fastapi import APIRouter, Depends, status
 from typing import Annotated
-from ..schemas import JWTTokensResponse, JWTRefreshRequest
+from ..schemas import JWTTokensResponse, JWTRefreshRequest, LoginResponse
 from .dependencies import (
     authorize_user,
     register_user,
     get_new_tokens,
 )
+from src.dependencies import parse_jwt
+from ...schemas import JWTPayload
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
+
+
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
@@ -56,3 +60,11 @@ async def refresh_tokens(
     При успешном обновлении возвращаются 2 токена: access и refresh.
     """
     return jwt_tokens
+
+
+@router.get(
+    "/get_login",
+    response_model=LoginResponse,
+)
+async def get_login(token_payload: Annotated[JWTPayload, Depends(parse_jwt)]):
+    return {"login": token_payload.user_id.hex}
