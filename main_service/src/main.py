@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 import aiohttp
 from contextlib import asynccontextmanager
-from src.auth_service.api import auth_router
-from src.vault_service.api import vault_router
+from src.authorization.api import auth_router
+from src.vaults.api import vault_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
