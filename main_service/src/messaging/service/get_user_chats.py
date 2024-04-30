@@ -21,5 +21,4 @@ async def get_user_chats(
         pydantic_model=user_credentials,
         endpoint=endpoint,
     )
-
     return chat_payloads

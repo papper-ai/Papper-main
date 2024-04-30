@@ -3,6 +3,7 @@ import aiohttp
 from contextlib import asynccontextmanager
 from src.authorization.api import auth_router
 from src.vaults.api import vault_router
+from src.messaging.api import messaging_router
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -25,6 +26,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(vault_router)
+app.include_router(messaging_router)
 
 
 @app.get("/")
