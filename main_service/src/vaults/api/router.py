@@ -142,12 +142,10 @@ async def get_vault_documents(
     vault_id: UUID4,
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
 ) -> list:
-
     response = await get_vault_documents_request(
         session=client_session,
         pydantic_model=VaultCredentials(vault_id=vault_id),
     )
-
     return response
 
 
@@ -160,12 +158,10 @@ async def get_users_vaults(
     token_payload: Annotated[JWTPayload, Depends(parse_jwt)],
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
 ) -> list:
-
     response = await get_user_vaults_preview_request(
         session=client_session,
         pydantic_model=UserCredentials(user_id=token_payload.user_id),
     )
-
     return response
 
 

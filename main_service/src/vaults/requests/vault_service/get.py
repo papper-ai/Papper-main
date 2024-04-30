@@ -25,7 +25,6 @@ async def get_info_from_service(
         result = await response.json()
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
-
     return result
 
 
@@ -38,7 +37,6 @@ async def get_vault_documents_request(
     result = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model
     )
-
     return [Document(**document) for document in result]
 
 
@@ -51,7 +49,6 @@ async def get_user_vaults_preview_request(
     result = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model
     )
-
     return [VaultPayloadPreview(**vault) for vault in result]
 
 
@@ -76,5 +73,4 @@ async def get_document_request(
     result: dict = await get_info_from_service(
         endpoint=endpoint, session=session, pydantic_model=pydantic_model
     )
-
     return Document(**result)

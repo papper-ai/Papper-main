@@ -17,7 +17,6 @@ async def delete_vault_request(
         result = await response.json()
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
-
     return
 
 
@@ -33,5 +32,4 @@ async def delete_document_request(
         result = await response.json()
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
-
     return

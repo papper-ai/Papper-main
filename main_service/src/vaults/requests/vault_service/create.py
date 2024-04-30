@@ -27,5 +27,4 @@ async def create_vault_request(
         result = await response.json()
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
-
     return VaultPayload(**result)
