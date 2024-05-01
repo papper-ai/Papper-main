@@ -2,7 +2,7 @@ import aiohttp
 from fastapi import HTTPException
 from src.utils import aiohttp_error_handler
 from ...schemas.chat import ChatCredentials
-from ...schemas.history import HistoryPayload
+from ...schemas.history import HistoryPayload, UserMessageResponse, AIMessageResponse
 from ..external_endpoints import history_endpoints
 
 
@@ -19,4 +19,14 @@ async def get_history_request(
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
 
-    return HistoryPayload(**result)
+    processed_history = []
+    for history in result["history"]:
+        if history["role"] == "user":
+            processed_history.append(UserMessageResponse(**history))
+        else:
+            processed_history.append(AIMessageResponse(**history))
+
+    history_payload = HistoryPayload(
+        chat_id=result["chat_id"], history=processed_history
+    )
+    return history_payload
