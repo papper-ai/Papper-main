@@ -15,6 +15,7 @@ services:
       - main_service/src/authorization/.env
       - main_service/src/vaults/.env
       - main_service/src/messaging/.env
+      - main_service/src/rag/.env
 
 
 networks:
