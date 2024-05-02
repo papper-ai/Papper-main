@@ -118,7 +118,7 @@ async def chat_archiving(
 
 
 @router.post(
-    "/clean_chat_history/{chat_id}",
+    "/clear_chat_history/{chat_id}",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Очистка истории чата",
