@@ -15,7 +15,7 @@ async def create_vault_request(
     headers = {"accept": "application/json"}
     json_data = pydantic_model.model_dump_json()
 
-    form = aiohttp.FormData()
+    form = aiohttp.FormData(quote_fields=False)
     form.add_field("create_vault_request", json_data, content_type="application/json")
     for file in files:
         file_bytes = await file.read()

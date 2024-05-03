@@ -34,7 +34,7 @@ async def add_document_request(
     headers = {"accept": "application/json"}
     json_data = pydantic_model.vault_id.hex
 
-    form = aiohttp.FormData()
+    form = aiohttp.FormData(quote_fields=False)
     form.add_field("vault_id", json_data, content_type="application/json")
     file_bytes = await file.read()
     form.add_field(
