@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
         yield {"client_session": session}
 
 
-app = FastAPI(lifespan=lifespan, title="Papper API", version="0.0.5")
+app = FastAPI(lifespan=lifespan, title="Papper API", version="0.0.7", root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
