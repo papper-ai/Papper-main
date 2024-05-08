@@ -6,7 +6,7 @@ from src.dependencies import parse_jwt, get_aiohttp_session
 from ..service import generate_answer
 from src.messaging.schemas.history import AIMessage
 
-router = APIRouter(prefix="/answer", tags=["QA"])
+router = APIRouter(prefix="/graph_answer", tags=["QA"])
 
 
 @router.post(

@@ -1,5 +1,5 @@
 import aiohttp
-from ..requests.graph_rag import get_answer_request
+from ..requests.qa import get_answer_request
 from ..schemas.qa import GenerationCredentials, AnswerGenerationCredentials
 from src.vaults.requests.vault_service import get_vault_request
 from src.vaults.schemas.vault import VaultCredentials
@@ -15,6 +15,7 @@ from src.messaging.requests.history_service import (
     add_user_message_request,
     add_ai_message_request,
 )
+from ..requests.external_endpoints import rag_endpoints
 import asyncio
 
 
@@ -32,15 +33,11 @@ async def generate_answer(
     vault_credentials = VaultCredentials(vault_id=generation_credentials.vault_id)
     chat_credentials = ChatCredentials(chat_id=generation_credentials.chat_id)
 
-    get_vault_task = get_vault_request(
-        session=session, pydantic_model=vault_credentials
-    )
-    get_history_task = get_history_request(
-        session=session, pydantic_model=chat_credentials
-    )
+    get_vault = get_vault_request(session=session, pydantic_model=vault_credentials)
+    get_history = get_history_request(session=session, pydantic_model=chat_credentials)
 
     vault_payload, chat_history = await asyncio.gather(
-        get_vault_task, get_history_task, return_exceptions=True
+        get_vault, get_history, return_exceptions=True
     )
 
     if isinstance(chat_history, Exception):
@@ -58,16 +55,24 @@ async def generate_answer(
     answer = None
     if vault_payload is None:
         answer = await get_answer_request(
-            session=session, pydantic_model=answer_generation_credentials
+            session=session,
+            pydantic_model=answer_generation_credentials,
+            endpoint=rag_endpoints.graph_answer,
         )
 
     if vault_payload.type == "graph":
         answer = await get_answer_request(
-            session=session, pydantic_model=answer_generation_credentials
+            session=session,
+            pydantic_model=answer_generation_credentials,
+            endpoint=rag_endpoints.graph_answer,
         )
 
     if vault_payload.type == "vector":
-        raise NotImplementedError
+        answer = await get_answer_request(
+            session=session,
+            pydantic_model=answer_generation_credentials,
+            endpoint=rag_endpoints.vector_answer,
+        )
 
     await add_ai_message_request(
         session=session,
@@ -76,4 +81,5 @@ async def generate_answer(
             message=answer,
         ),
     )
+
     return answer

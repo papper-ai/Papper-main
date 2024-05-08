@@ -1,7 +1,6 @@
 import aiohttp
 from fastapi import HTTPException
 from src.utils import aiohttp_error_handler
-from ..external_endpoints import graph_rag_endpoints
 from ...schemas.qa import AnswerGenerationCredentials
 from src.messaging.schemas.history import AIMessage
 
@@ -10,7 +9,7 @@ from src.messaging.schemas.history import AIMessage
 async def get_answer_request(
     session: aiohttp.ClientSession,
     pydantic_model: AnswerGenerationCredentials,
-    endpoint: str = graph_rag_endpoints.get_answer,
+    endpoint: str,
 ) -> AIMessage:
     json_data = pydantic_model.model_dump(mode="json")
 
