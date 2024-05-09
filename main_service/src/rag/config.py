@@ -30,5 +30,4 @@ class Setting(BaseModel):
     graph_rag_service: GraphRagServiceSettings = GraphRagServiceSettings()
 
 
-
 settings = Setting()
