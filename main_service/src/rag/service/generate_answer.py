@@ -1,3 +1,5 @@
+import logging
+
 import aiohttp
 from ..requests.qa import get_answer_request
 from ..schemas.qa import GenerationCredentials, AnswerGenerationCredentials
@@ -68,6 +70,7 @@ async def generate_answer(
         )
 
     if vault_payload.type == "vector":
+        logging.info(f"endpoint: {rag_endpoints.vector_answer}")
         answer = await get_answer_request(
             session=session,
             pydantic_model=answer_generation_credentials,
