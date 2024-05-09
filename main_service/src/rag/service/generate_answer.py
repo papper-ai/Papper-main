@@ -55,6 +55,7 @@ async def generate_answer(
     )
 
     answer = None
+    logging.info(f"vault_type: {vault_payload.type}")
     if vault_payload is None:
         answer = await get_answer_request(
             session=session,
