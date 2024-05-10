@@ -13,7 +13,7 @@ async def get_answer_request(
 ) -> AIMessage:
     json_data = pydantic_model.model_dump(mode="json")
 
-    async with session.post(url=endpoint, json=json_data) as response:
+    async with session.post(url=endpoint, json=json_data, timeout=30) as response:
         result = await response.json()
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
