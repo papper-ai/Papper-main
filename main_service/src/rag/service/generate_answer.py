@@ -39,14 +39,6 @@ async def generate_answer(
         get_vault, get_history, return_exceptions=True
     )
 
-    if isinstance(chat_history, Exception):
-        history_error = chat_history
-        chat_history = None
-
-    if isinstance(vault_payload, Exception):
-        vault_error = vault_payload
-        vault_payload = None
-
     try:
         await add_user_message_request(
             session=session,
@@ -56,7 +48,15 @@ async def generate_answer(
             ),
         )
     except Exception as generic_error:
-        add_user_message_error = generic_error
+        add_user_message_error = str(generic_error)
+
+    if isinstance(chat_history, Exception):
+        history_error = str(chat_history)
+        chat_history = None
+
+    if isinstance(vault_payload, Exception):
+        vault_error = str(vault_payload)
+        vault_payload = None
 
     answer_generation_credentials = AnswerGenerationCredentials(
         vault_id=vault_payload.id if vault_payload is not None else None,
@@ -95,14 +95,22 @@ async def generate_answer(
             ),
         )
     except Exception as generic_error:
-        add_ai_message_error = generic_error
+        add_ai_message_error = str(generic_error)
 
     history_exception = (
         {True: history_error} if history_error is not None else {False: ""}
     )
     vault_exception = {True: vault_error} if vault_error is not None else {False: ""}
-    add_ai_message_exception = {True: add_ai_message_error} if add_ai_message_error is not None else {False: ""}
-    add_user_message_exception = {True: add_user_message_error} if add_user_message_error is not None else {False: ""}
+    add_ai_message_exception = (
+        {True: add_ai_message_error}
+        if add_ai_message_error is not None
+        else {False: ""}
+    )
+    add_user_message_exception = (
+        {True: add_user_message_error}
+        if add_user_message_error is not None
+        else {False: ""}
+    )
 
     model_answer = ModelAnswer(
         ai_message=answer,

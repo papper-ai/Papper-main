@@ -17,7 +17,7 @@ class AnswerGenerationCredentials(BaseModel):
 
 class ModelAnswer(BaseModel):
     ai_message: AIMessage
-    history_exception: dict[bool, str] = Field(default={False: ""})
+    history_exception: dict[bool, str] = Field(examples=[{False: ""}])
     vault_exception: dict[bool, str] = Field(
         examples=[{True: "500: service: an unexpected error occurred."}]
     )
