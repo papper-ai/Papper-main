@@ -49,7 +49,7 @@ def aiohttp_error_handler(service_name: str):
                 # Call the decorated function
                 return await func(*args, **kwargs)
             except (
-                aiohttp.ClientConnectionError | asyncio.TimeoutError
+                aiohttp.ClientConnectionError, asyncio.TimeoutError
             ) as connect_error:
                 logging.error(connect_error)
                 raise HTTPException(
