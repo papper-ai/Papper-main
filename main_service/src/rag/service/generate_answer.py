@@ -53,7 +53,7 @@ async def generate_answer(
     )
 
     answer = None
-    if vault_payload.type is None:
+    if vault_payload is None:
         answer = await get_answer_request(
             session=session,
             pydantic_model=answer_generation_credentials,
