@@ -24,13 +24,16 @@ import asyncio
 async def generate_answer(
     generation_credentials: GenerationCredentials, session: aiohttp.ClientSession
 ) -> AIMessage:
-    await add_user_message_request(
-        session=session,
-        pydantic_model=AddUserMessage(
-            chat_id=generation_credentials.chat_id,
-            message=UserMessage(content=generation_credentials.query),
-        ),
-    )
+    try:
+        await add_user_message_request(
+            session=session,
+            pydantic_model=AddUserMessage(
+                chat_id=generation_credentials.chat_id,
+                message=UserMessage(content=generation_credentials.query),
+            ),
+        )
+    except Exception:
+        pass
 
     vault_credentials = VaultCredentials(vault_id=generation_credentials.vault_id)
     chat_credentials = ChatCredentials(chat_id=generation_credentials.chat_id)
