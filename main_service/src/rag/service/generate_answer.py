@@ -84,7 +84,7 @@ async def generate_answer(
                 message=answer,
             ),
         )
-    except Exception as generic_error:
-        logging.error(generic_error)
+    except Exception:
+        pass
 
     return answer
