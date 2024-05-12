@@ -1,4 +1,6 @@
 import aiohttp
+from fastapi import HTTPException
+
 from ..requests.qa import get_answer_request
 from ..schemas.qa import GenerationCredentials, AnswerGenerationCredentials
 from src.vaults.requests.vault_service import get_vault_request
@@ -40,10 +42,10 @@ async def generate_answer(
         get_vault, get_history, return_exceptions=True
     )
 
-    if isinstance(chat_history, Exception):
+    if isinstance(chat_history, HTTPException):
         chat_history = None
 
-    if isinstance(vault_payload, Exception):
+    if isinstance(vault_payload, HTTPException):
         vault_payload = None
 
     answer_generation_credentials = AnswerGenerationCredentials(
@@ -53,6 +55,7 @@ async def generate_answer(
     )
 
     answer = None
+
     if vault_payload is None:
         answer = await get_answer_request(
             session=session,
