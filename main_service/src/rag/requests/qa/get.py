@@ -5,7 +5,7 @@ from ...schemas.qa import AnswerGenerationCredentials
 from src.messaging.schemas.history import AIMessage
 
 
-@aiohttp_error_handler(service_name="Graph RAG")
+@aiohttp_error_handler(service_name="RAG")
 async def get_answer_request(
     session: aiohttp.ClientSession,
     pydantic_model: AnswerGenerationCredentials,

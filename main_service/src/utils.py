@@ -48,7 +48,9 @@ def aiohttp_error_handler(service_name: str):
             try:
                 # Call the decorated function
                 return await func(*args, **kwargs)
-            except aiohttp.ClientConnectionError as connect_error:
+            except (
+                aiohttp.ClientConnectionError | asyncio.TimeoutError
+            ) as connect_error:
                 logging.error(connect_error)
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

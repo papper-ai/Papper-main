@@ -41,7 +41,10 @@ async def add_document_request(
         "file", file_bytes, filename=file.filename, content_type=file.content_type
     )
 
-    async with session.post(url=endpoint, headers=headers, data=form) as response:
+    timeout = aiohttp.ClientTimeout(total=60 * 3)
+    async with session.post(
+        url=endpoint, headers=headers, data=form, timeout=timeout
+    ) as response:
         result = await response.json()
         if response.status >= 400:
             raise HTTPException(status_code=response.status, detail=result["detail"])
