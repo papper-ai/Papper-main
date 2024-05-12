@@ -101,8 +101,16 @@ async def generate_answer(
         {True: history_error} if history_error is not None else {False: ""}
     )
     vault_exception = {True: vault_error} if vault_error is not None else {False: ""}
-    add_ai_message_exception = {True: add_ai_message_error} if add_ai_message_error is not None else {False: ""}
-    add_user_message_exception = {True: add_user_message_error} if add_user_message_error is not None else {False: ""}
+    add_ai_message_exception = (
+        {True: add_ai_message_error}
+        if add_ai_message_error is not None
+        else {False: ""}
+    )
+    add_user_message_exception = (
+        {True: add_user_message_error}
+        if add_user_message_error is not None
+        else {False: ""}
+    )
 
     model_answer = ModelAnswer(
         ai_message=answer,
