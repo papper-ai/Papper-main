@@ -9,6 +9,6 @@ class GenerationCredentials(BaseModel):
 
 
 class AnswerGenerationCredentials(BaseModel):
-    vault_id: UUID4
+    vault_id: UUID4 | None
     query: str
-    history: list[UserMessageResponse | AIMessageResponse]
+    history: list[UserMessageResponse | AIMessageResponse] | None
