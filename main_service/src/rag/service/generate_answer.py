@@ -2,7 +2,7 @@ import logging
 
 import aiohttp
 from ..requests.qa import get_answer_request
-from ..schemas.qa import GenerationCredentials, AnswerGenerationCredentials
+from ..schemas.qa import GenerationCredentials, AnswerGenerationCredentials, ModelAnswer
 from src.vaults.requests.vault_service import get_vault_request
 from src.vaults.schemas.vault import VaultCredentials
 from src.messaging.schemas.chat import ChatCredentials
@@ -23,17 +23,11 @@ import asyncio
 
 async def generate_answer(
     generation_credentials: GenerationCredentials, session: aiohttp.ClientSession
-) -> AIMessage:
-    try:
-        await add_user_message_request(
-            session=session,
-            pydantic_model=AddUserMessage(
-                chat_id=generation_credentials.chat_id,
-                message=UserMessage(content=generation_credentials.query),
-            ),
-        )
-    except Exception:
-        pass
+) -> ModelAnswer:
+    history_error = None
+    vault_error = None
+    add_user_message_error = None
+    add_ai_message_error = None
 
     vault_credentials = VaultCredentials(vault_id=generation_credentials.vault_id)
     chat_credentials = ChatCredentials(chat_id=generation_credentials.chat_id)
@@ -46,10 +40,23 @@ async def generate_answer(
     )
 
     if isinstance(chat_history, Exception):
+        history_error = chat_history
         chat_history = None
 
     if isinstance(vault_payload, Exception):
+        vault_error = vault_payload
         vault_payload = None
+
+    try:
+        await add_user_message_request(
+            session=session,
+            pydantic_model=AddUserMessage(
+                chat_id=generation_credentials.chat_id,
+                message=UserMessage(content=generation_credentials.query),
+            ),
+        )
+    except Exception as generic_error:
+        add_user_message_error = generic_error
 
     answer_generation_credentials = AnswerGenerationCredentials(
         vault_id=vault_payload.id if vault_payload is not None else None,
@@ -87,7 +94,22 @@ async def generate_answer(
                 message=answer,
             ),
         )
-    except Exception:
-        pass
+    except Exception as generic_error:
+        add_ai_message_error = generic_error
 
-    return answer
+    history_exception = (
+        {True: history_error} if history_error is not None else {False: ""}
+    )
+    vault_exception = {True: vault_error} if vault_error is not None else {False: ""}
+    add_ai_message_exception = {True: add_ai_message_error} if add_ai_message_error is not None else {False: ""}
+    add_user_message_exception = {True: add_user_message_error} if add_user_message_error is not None else {False: ""}
+
+    model_answer = ModelAnswer(
+        ai_message=answer,
+        history_exception=history_exception,
+        vault_exception=vault_exception,
+        add_ai_message_exception=add_ai_message_exception,
+        add_user_message_exception=add_user_message_exception,
+    )
+
+    return model_answer
