@@ -1,3 +1,5 @@
+import logging
+
 import aiohttp
 from ..requests.qa import get_answer_request
 from ..schemas.qa import GenerationCredentials, AnswerGenerationCredentials
@@ -59,27 +61,30 @@ async def generate_answer(
             pydantic_model=answer_generation_credentials,
             endpoint=rag_endpoints.graph_answer,
         )
+    else:
+        if vault_payload.type == "graph":
+            answer = await get_answer_request(
+                session=session,
+                pydantic_model=answer_generation_credentials,
+                endpoint=rag_endpoints.graph_answer,
+            )
 
-    if vault_payload.type == "graph":
-        answer = await get_answer_request(
+        if vault_payload.type == "vector":
+            answer = await get_answer_request(
+                session=session,
+                pydantic_model=answer_generation_credentials,
+                endpoint=rag_endpoints.vector_answer,
+            )
+
+    try:
+        await add_ai_message_request(
             session=session,
-            pydantic_model=answer_generation_credentials,
-            endpoint=rag_endpoints.graph_answer,
+            pydantic_model=AddAIMessage(
+                chat_id=generation_credentials.chat_id,
+                message=answer,
+            ),
         )
-
-    if vault_payload.type == "vector":
-        answer = await get_answer_request(
-            session=session,
-            pydantic_model=answer_generation_credentials,
-            endpoint=rag_endpoints.vector_answer,
-        )
-
-    await add_ai_message_request(
-        session=session,
-        pydantic_model=AddAIMessage(
-            chat_id=generation_credentials.chat_id,
-            message=answer,
-        ),
-    )
+    except Exception as generic_error:
+        logging.error(generic_error)
 
     return answer
