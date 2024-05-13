@@ -20,7 +20,7 @@ app = FastAPI(lifespan=lifespan, title="Papper API", version="0.0.7", root_path=
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://172.20.0.2"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
