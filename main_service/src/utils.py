@@ -48,13 +48,17 @@ def aiohttp_error_handler(service_name: str):
             try:
                 # Call the decorated function
                 return await func(*args, **kwargs)
-            except (
-                aiohttp.ClientConnectionError, asyncio.TimeoutError
-            ) as connect_error:
+            except aiohttp.ClientConnectionError as connect_error:
                 logging.error(connect_error)
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                     detail=f"{service_name} service is temporarily unavailable.",
+                )
+            except asyncio.TimeoutError as timeout_error:
+                logging.error(timeout_error)
+                raise HTTPException(
+                    status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                    detail=f"{service_name} service timed out.",
                 )
             except aiohttp.ContentTypeError as content_error:
                 logging.error(content_error)

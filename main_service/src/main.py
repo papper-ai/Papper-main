@@ -11,7 +11,7 @@ import uvicorn
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    timeout = aiohttp.ClientTimeout(total=65, connect=5)
+    timeout = aiohttp.ClientTimeout(total=120, connect=5)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         yield {"client_session": session}
 

@@ -9,7 +9,7 @@ from src.messaging.schemas.chat import ChatCredentials
 from src.messaging.schemas.history import (
     AddUserMessage,
     AddAIMessage,
-    AIMessage,
+    AIMessageResponse,
     UserMessage,
 )
 from src.messaging.requests.history_service import (
@@ -113,7 +113,7 @@ async def generate_answer(
     )
 
     model_answer = ModelAnswer(
-        ai_message=answer,
+        ai_message=AIMessageResponse(**answer.model_dump(), role="ai"),
         history_exception=history_exception,
         vault_exception=vault_exception,
         add_ai_message_exception=add_ai_message_exception,

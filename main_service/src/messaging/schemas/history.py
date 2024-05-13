@@ -1,6 +1,4 @@
-from typing import Annotated
-
-from pydantic import BaseModel, UUID4, Field
+from pydantic import BaseModel, UUID4
 
 
 class TracebackUnit(BaseModel):
@@ -20,25 +18,28 @@ class AIMessage(BaseMessage):
     traceback: list[TracebackUnit | None]
 
 
-class AddUserMessage(BaseModel):
+class BaseAddMessage(BaseModel):
     chat_id: UUID4
+
+
+class AddUserMessage(BaseAddMessage):
     message: UserMessage
 
 
-class AddAIMessage(BaseModel):
-    chat_id: UUID4
+class AddAIMessage(BaseAddMessage):
     message: AIMessage
 
 
-class AIMessageResponse(BaseModel):
+class BaseMessageResponse(BaseMessage):
     role: str
-    content: str
+
+
+class AIMessageResponse(BaseMessageResponse):
     traceback: list[TracebackUnit | None]
 
 
-class UserMessageResponse(BaseModel):
-    role: str
-    content: str
+class UserMessageResponse(BaseMessageResponse):
+    pass
 
 
 class HistoryPayload(BaseModel):

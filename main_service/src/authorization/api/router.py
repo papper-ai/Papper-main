@@ -67,5 +67,4 @@ async def refresh_tokens(
     response_model=LoginResponse,
 )
 async def get_login(token_payload: Annotated[JWTPayload, Depends(parse_jwt)]):
-    print(token_payload)
     return {"login": token_payload.login}
