@@ -28,24 +28,26 @@ async def delete_vault_and_chats(
             )
         )
 
-    done, pending = await asyncio.wait(
-        delete_tasks, return_when=asyncio.FIRST_EXCEPTION
-    )
-
-    for task in pending:
-        if not task.cancelled():
-            if task.exception() is None:
-                task.cancel()
-    try:
-        for task in done:
-            if task.exception() is not None:
-                raise task.exception()
-    except HTTPException as http_exception:
-        logging.error(http_exception)
-        raise HTTPException(
-            detail="Failed to delete chats, several chats have been not deleted. Vault not deleted too",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    if len(delete_tasks) > 0:
+        done, pending = await asyncio.wait(
+            delete_tasks, return_when=asyncio.FIRST_EXCEPTION
         )
 
-    await delete_vault_request(session=session, pydantic_model=vault_credentials)
+        for task in pending:
+            if not task.cancelled():
+                if task.exception() is None:
+                    task.cancel()
+        try:
+            for task in done:
+                if task.exception() is not None:
+                    raise task.exception()
+        except HTTPException as http_exception:
+            logging.error(http_exception)
+            raise HTTPException(
+                detail="Failed to delete chats, several chats have been not deleted. Vault not deleted too",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+    else:
+        logging.info("No chats to delete")
+        await delete_vault_request(session=session, pydantic_model=vault_credentials)
     return
