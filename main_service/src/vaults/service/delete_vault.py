@@ -29,7 +29,7 @@ async def delete_vault_and_chats(
         )
 
     done, pending = await asyncio.wait(
-        *delete_tasks, return_when=asyncio.FIRST_EXCEPTION
+        delete_tasks, return_when=asyncio.FIRST_EXCEPTION
     )
 
     for task in pending:
