@@ -14,6 +14,7 @@ class ChatsEndpoints(BaseModel):
     get_chat_by_id: str = f"{CHATS_SERVICE_URL}/get_chat_by_id"
     archive_chat: str = f"{CHATS_SERVICE_URL}/archive_chat"
     unarchive_chat: str = f"{CHATS_SERVICE_URL}/unarchive_chat"
+    get_vault_chats: str = f"{CHATS_SERVICE_URL}/get_vault_chats"
 
 
 class HistoryEndpoints(BaseModel):
