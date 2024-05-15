@@ -13,10 +13,9 @@ import uvicorn
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    tokenizer = AutoTokenizer.from_pretrained(
+    ml_models["tokenizer"] = AutoTokenizer.from_pretrained(
         "lightblue/suzume-llama-3-8B-multilingual"
     )
-    ml_models["tokenizer"] = tokenizer
     timeout = aiohttp.ClientTimeout(total=120, connect=5)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         yield {"client_session": session}
