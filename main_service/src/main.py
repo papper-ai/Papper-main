@@ -7,7 +7,7 @@ from src.messaging.api import messaging_router
 from src.rag.api import qa_router
 from fastapi.middleware.cors import CORSMiddleware
 from transformers import AutoTokenizer
-from shared import ml_models
+from src.shared import ml_models
 import uvicorn
 
 
