@@ -17,6 +17,7 @@ from src.messaging.requests.history_service import (
     add_user_message_request,
     add_ai_message_request,
 )
+from ..utils import truncate_history
 from ..requests.external_endpoints import rag_endpoints
 import asyncio
 
@@ -58,10 +59,15 @@ async def generate_answer(
         vault_error = str(vault_payload)
         vault_payload = None
 
+    history = (
+        await truncate_history(chat_history.history, max_tokens=3000)
+        if chat_history is not None
+        else []
+    )
     answer_generation_credentials = AnswerGenerationCredentials(
         vault_id=vault_payload.id if vault_payload is not None else None,
         query=generation_credentials.query,
-        history=chat_history.history if chat_history is not None else [],
+        history=history,
     )
 
     answer = None

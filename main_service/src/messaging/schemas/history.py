@@ -44,4 +44,4 @@ class UserMessageResponse(BaseMessageResponse):
 
 class HistoryPayload(BaseModel):
     chat_id: UUID4
-    history: list[UserMessageResponse | AIMessageResponse]
+    history: list[UserMessageResponse | AIMessageResponse | None]
