@@ -25,6 +25,7 @@ from ..requests.vault_service import (
     get_vault_request,
     get_document_request,
 )
+from ..service import delete_vault_and_chats
 import aiohttp
 from pydantic import UUID4
 
@@ -86,9 +87,9 @@ async def delete_vault(
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
     vault_id: UUID4,
 ) -> None:
-    await delete_vault_request(
+    await delete_vault_and_chats(
         session=client_session,
-        pydantic_model=VaultCredentials(vault_id=vault_id),
+        vault_credentials=VaultCredentials(vault_id=vault_id),
     )
     return
 

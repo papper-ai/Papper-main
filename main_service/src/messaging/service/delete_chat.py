@@ -28,7 +28,6 @@ async def delete_chat(
         await create_history_request(session=session, pydantic_model=chat_credentials)
         if isinstance(generic_error, HTTPException):
             raise generic_error
-
         logging.error(generic_error)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

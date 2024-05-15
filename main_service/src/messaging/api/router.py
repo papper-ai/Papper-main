@@ -11,8 +11,8 @@ from ..schemas.chat import (
 from ..schemas.user import UserCredentials
 from ..service import (
     create_chat,
-    get_user_chats,
-    get_chat,
+    get_chats_by_user_id,
+    get_chat_by_user_id,
     update_chat_name,
     change_chat_archive_status,
     clean_chat_history,
@@ -60,10 +60,8 @@ async def getting_user_chats(
     is_archived: Annotated[bool, Query()] = False,
 ) -> list[ChatPayload]:
     user_credentials = UserCredentials(user_id=jwt_payload.user_id)
-    chat_payloads = await get_user_chats(
-        session=session,
-        user_credentials=user_credentials,
-        is_archived=is_archived,
+    chat_payloads = await get_chats_by_user_id(
+        session=session, user_credentials=user_credentials, is_archived=is_archived
     )
     return chat_payloads
 
@@ -79,7 +77,9 @@ async def getting_particular_chat(
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
 ) -> ChatPayload:
     chat_credentials = ChatCredentials(chat_id=chat_id)
-    chat_payload = await get_chat(session=session, chat_credentials=chat_credentials)
+    chat_payload = await get_chat_by_user_id(
+        session=session, chat_credentials=chat_credentials
+    )
     return chat_payload
 
 
