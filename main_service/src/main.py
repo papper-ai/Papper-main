@@ -6,8 +6,6 @@ from src.vaults.api import vault_router
 from src.messaging.api import messaging_router
 from src.rag.api import qa_router
 from fastapi.middleware.cors import CORSMiddleware
-from transformers import AutoTokenizer
-from src.shared import ml_models
 import uvicorn
 
 
@@ -15,9 +13,6 @@ import uvicorn
 async def lifespan(app: FastAPI):
     timeout = aiohttp.ClientTimeout(total=120, connect=5)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        ml_models["tokenizer"] = AutoTokenizer.from_pretrained(
-            "lightblue/suzume-llama-3-8B-multilingual"
-        )
         yield {"client_session": session}
 
 
