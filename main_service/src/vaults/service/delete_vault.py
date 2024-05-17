@@ -34,6 +34,7 @@ async def delete_vault_and_chats(
         )
 
         for task in pending:
+            #TODO: remove cancelled checking
             if not task.cancelled():
                 if task.exception() is None:
                     task.cancel()
