@@ -3,7 +3,7 @@ from pydantic import BaseModel, UUID4
 
 class TracebackUnit(BaseModel):
     document_id: UUID4
-    document_name: str | None
+    document_name: str
     information: str
 
 
