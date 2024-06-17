@@ -160,5 +160,5 @@ cython_debug/
 .idea/**
 
 # Sertificates
-main_service/certs/
+certs/
 /.env
