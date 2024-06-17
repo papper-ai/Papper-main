@@ -6,6 +6,7 @@ from .dependencies import (
     register_user,
     get_new_tokens,
 )
+from fastapi_cache.decorator import cache
 from src.dependencies import parse_jwt
 from ...schemas import JWTPayload
 
@@ -49,7 +50,7 @@ async def registration():
 
 
 @router.post(
-    "/refresh_access_token",
+    "/token/refresh/access",
     response_model=JWTTokensResponse,
 )
 async def refresh_tokens(
@@ -63,8 +64,9 @@ async def refresh_tokens(
 
 
 @router.get(
-    "/get_login",
+    "/user-login",
     response_model=LoginResponse,
 )
+@cache(expire=240)
 async def get_login(token_payload: Annotated[JWTPayload, Depends(parse_jwt)]):
     return {"login": token_payload.login}

@@ -21,12 +21,13 @@ from ..service import (
 from src.dependencies import parse_jwt, get_aiohttp_session
 from src.schemas import JWTPayload
 from typing import Annotated
+from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix="/messaging", tags=["Messaging (Chats & History)"])
 
 
 @router.post(
-    "/create_chat",
+    "/chat",
     description="Создание чата для беседы с ИИ",
     status_code=status.HTTP_201_CREATED,
     response_model=ChatPayload,
@@ -50,10 +51,11 @@ async def chat_creation(
 
 
 @router.get(
-    "/get_user_chats_preview",
+    "/chats/info/preview",
     response_model=list[ChatPayload],
     description="Получение чатов пользователя (архивированные или нет). Если нужны архивированные - то передайте параметр is_archived=true (get_user_chats?is_archived=true). **ЧАТЫ БЕЗ ИСТОРИИ**",
 )
+@cache(expire=240)
 async def getting_user_chats(
     jwt_payload: Annotated[JWTPayload, Depends(parse_jwt)],
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
@@ -67,11 +69,12 @@ async def getting_user_chats(
 
 
 @router.get(
-    "/get_chat/{chat_id}",
+    "/chat/{chat_id}",
     response_model=ChatPayload,
     dependencies=[Depends(parse_jwt)],
     description="Получение определённого чата по ID, **ВКЛЮЧАЯ ИСТОРИЮ**",
 )
+@cache(expire=240)
 async def getting_particular_chat(
     chat_id: Annotated[UUID4, Path()],
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
@@ -84,7 +87,7 @@ async def getting_particular_chat(
 
 
 @router.patch(
-    "/rename_chat",
+    "/chat/renaming",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_202_ACCEPTED,
     description="Переименование чата",
@@ -101,7 +104,7 @@ async def chat_renaming(
 
 
 @router.patch(
-    "/change_chat_archive_status",
+    "/chat/archive-status",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Архивирование или разархивирование чата. Ключ __archive_action__ может быть `archive` или `unarchive`",
@@ -118,7 +121,7 @@ async def chat_archiving(
 
 
 @router.post(
-    "/clear_chat_history/{chat_id}",
+    "/chat/{chat_id}/history/cleaning",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Очистка истории чата",
@@ -136,7 +139,7 @@ async def chat_history_cleaning(
 
 
 @router.delete(
-    "/delete_chat/{chat_id}",
+    "/chat/{chat_id}",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Удаление чата и истории",

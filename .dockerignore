@@ -1,6 +1,10 @@
 # Environment
 venv/
 .venv
-
 **/__pycache__/
 **/.env
+.gitignore
+docker-compose.prod.yaml
+docker-compose.yaml
+docker/**
+README.MD

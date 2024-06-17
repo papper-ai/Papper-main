@@ -28,12 +28,13 @@ from ..requests.vault_service import (
 from ..service import delete_vault_and_chats
 import aiohttp
 from pydantic import UUID4
+from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix="/vault", tags=["Documents & Vaults"])
 
 
 @router.post(
-    "/create_vault",
+    "/vault",
     response_model=VaultPayload,
     status_code=status.HTTP_201_CREATED,
     description="Создание нового хранилища документов. Тип хранилища `vector` или `graph`",
@@ -56,8 +57,8 @@ async def create_vaults(
     return response
 
 
-@router.post(
-    "/upload_document",
+@router.patch(
+    "/vault/document",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_201_CREATED,
     response_model=VaultPayload,
@@ -78,7 +79,7 @@ async def upload_document(
 
 
 @router.delete(
-    "/delete_vault/{vault_id}",
+    "/vault/{vault_id}",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Удаление хранилища документов",
@@ -95,7 +96,7 @@ async def delete_vault(
 
 
 @router.delete(
-    "/delete_document/{vault_id}/{document_id}",
+    "/vault/{vault_id}/document/{document_id}",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Удаление документа из хранилища",
@@ -115,7 +116,7 @@ async def delete_document(
 
 
 @router.patch(
-    "/update_vault_name",
+    "/vault/name",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Изменение имени хранилища документов",
@@ -134,11 +135,12 @@ async def update_vault_name(
 
 
 @router.get(
-    "/get_vault_documents/{vault_id}",
+    "/vault/{vault_id}/documents",
     dependencies=[Depends(parse_jwt)],
     response_model=list[Document],
     description="Получение всех документов, находящихся в хранилище.",
 )
+@cache(expire=240)
 async def get_vault_documents(
     vault_id: UUID4,
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
@@ -151,10 +153,11 @@ async def get_vault_documents(
 
 
 @router.get(
-    "/get_user_vaults_preview",
+    "/vaults/info/preview",
     response_model=list[VaultPayloadPreview],
     description="Получение превью списка хранилищ, созданных пользователем. **Данные извлекаются из токена!**",
 )
+@cache(expire=240)
 async def get_users_vaults(
     token_payload: Annotated[JWTPayload, Depends(parse_jwt)],
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
@@ -167,11 +170,12 @@ async def get_users_vaults(
 
 
 @router.get(
-    "/get_vault/{vault_id}",
+    "/vault/{vault_id}/info",
     dependencies=[Depends(parse_jwt)],
     response_model=VaultPayload,
     description="Получение **ВСЕХ** данных о хранилище.",
 )
+@cache(expire=240)
 async def get_vault(
     vault_id: UUID4,
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
@@ -184,11 +188,12 @@ async def get_vault(
 
 
 @router.get(
-    "/get_document/{document_id}",
+    "/document/{document_id}",
     dependencies=[Depends(parse_jwt)],
     response_model=Document,
     description="Получение **ВСЕХ** о определенном документе из хранилища.",
 )
+@cache(expire=240)
 async def get_document(
     document_id: UUID4,
     client_session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
