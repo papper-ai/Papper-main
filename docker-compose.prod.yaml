@@ -7,7 +7,7 @@ services:
     networks:
       - papper-main-service-network
     ports:
-      - ${REDIS_PORT}:6379
+      - ${REDIS_PORT:=6379}:6379
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 1m
@@ -24,7 +24,7 @@ services:
       - papper-main-service-network
       - papper-backend
     ports:
-      - ${MAIN_SERVICE_PORT}:8000
+      - ${MAIN_SERVICE_PORT:=8080}:8000
     restart: unless-stopped
     environment:
       - VAULT_SERVICE_HOST=${VAULT_SERVICE_HOST}
