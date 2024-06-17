@@ -13,7 +13,6 @@ services:
       interval: 1m
       timeout: 30s
       retries: 3
-      start_period: 30s
 
   main-service:
     container_name: papper-main-service
@@ -44,7 +43,6 @@ services:
       interval: 1m
       timeout: 30s
       retries: 3
-      start_period: 30s
     depends_on:
       redis:
         condition: service_healthy
