@@ -170,7 +170,7 @@ async def get_users_vaults(
 
 
 @router.get(
-    "/{vault_id}/info",
+    "/{vault_id}",
     dependencies=[Depends(parse_jwt)],
     response_model=VaultPayload,
     description="Получение **ВСЕХ** данных о хранилище.",
