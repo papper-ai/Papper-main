@@ -13,6 +13,6 @@ RUN apt-get update && apt-get install -y iputils-ping &&\
 
 COPY . main_service/
 
-ENV PYTHONPATH=/usr/data/app/main_service
+ENV PYTHONPATH=/usr/data/app/
 
 ENTRYPOINT ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-config", "main_service/src/uvicorn-logging-config.yaml"]

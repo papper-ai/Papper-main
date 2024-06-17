@@ -16,7 +16,7 @@ RUN apt-get update &&\
 
 COPY --chown=papperuser:papperuser . main_service/
 
-ENV PYTHONPATH=/usr/data/app/main_service
+ENV PYTHONPATH=/usr/data/app/
 
 USER papperuser
 
