@@ -34,7 +34,7 @@ router = APIRouter(prefix="/vault", tags=["Documents & Vaults"])
 
 
 @router.post(
-    "/vault",
+    "",
     response_model=VaultPayload,
     status_code=status.HTTP_201_CREATED,
     description="Создание нового хранилища документов. Тип хранилища `vector` или `graph`",
@@ -58,7 +58,7 @@ async def create_vaults(
 
 
 @router.patch(
-    "/vault/document",
+    "/document",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_201_CREATED,
     response_model=VaultPayload,
@@ -79,7 +79,7 @@ async def upload_document(
 
 
 @router.delete(
-    "/vault/{vault_id}",
+    "/{vault_id}",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Удаление хранилища документов",
@@ -96,7 +96,7 @@ async def delete_vault(
 
 
 @router.delete(
-    "/vault/{vault_id}/document/{document_id}",
+    "/{vault_id}/document/{document_id}",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Удаление документа из хранилища",
@@ -116,7 +116,7 @@ async def delete_document(
 
 
 @router.patch(
-    "/vault/name",
+    "/name",
     dependencies=[Depends(parse_jwt)],
     status_code=status.HTTP_204_NO_CONTENT,
     description="Изменение имени хранилища документов",
@@ -135,7 +135,7 @@ async def update_vault_name(
 
 
 @router.get(
-    "/vault/{vault_id}/documents",
+    "/{vault_id}/documents",
     dependencies=[Depends(parse_jwt)],
     response_model=list[Document],
     description="Получение всех документов, находящихся в хранилище.",
@@ -153,7 +153,7 @@ async def get_vault_documents(
 
 
 @router.get(
-    "/vaults/info/preview",
+    "/vaults/preview",
     response_model=list[VaultPayloadPreview],
     description="Получение превью списка хранилищ, созданных пользователем. **Данные извлекаются из токена!**",
 )
@@ -170,7 +170,7 @@ async def get_users_vaults(
 
 
 @router.get(
-    "/vault/{vault_id}/info",
+    "/{vault_id}/info",
     dependencies=[Depends(parse_jwt)],
     response_model=VaultPayload,
     description="Получение **ВСЕХ** данных о хранилище.",
