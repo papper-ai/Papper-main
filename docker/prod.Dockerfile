@@ -14,7 +14,7 @@ RUN apt-get update &&\
     rm -rf /var/lib/apt/lists/* && \
     rm -r requirements
 
-COPY --chown=papperuser:papperuser . main_service/
+COPY --chown=papperuser:papperuser . .
 
 ENV PYTHONPATH=/usr/data/app/
 
