@@ -13,6 +13,7 @@ services:
       interval: 1m
       timeout: 30s
       retries: 3
+      start_period: 1m
 
   main-service:
     container_name: papper-main-service
@@ -26,23 +27,24 @@ services:
       - ${MAIN_SERVICE_PORT}:8000
     restart: unless-stopped
     environment:
-      - VAULT_SERVICE_HOST=
-      - VAULT_SERVICE_PORT=
-      - GRAPH_RAG_SERVICE_HOST=
-      - GRAPH_RAG_SERVICE_PORT=
-      - VECTOR_RAG_SERVICE_HOST=
-      - VECTOR_RAG_SERVICE_PORT=
-      - CHATS_SERVICE_HOST=
-      - CHATS_SERVICE_HOST=
-      - HISTORY_SERVICE_HOST=
-      - HISTORY_SERVICE_HOST=
-      - AUTH_SERVICE_HOST=
-      - AUTH_SERVICE_HOST=
+      - VAULT_SERVICE_HOST=${VAULT_SERVICE_HOST}
+      - VAULT_SERVICE_PORT=${VAULT_SERVICE_PORT:=8000}
+      - GRAPH_RAG_SERVICE_HOST=${VAULT_SERVICE_HOST}
+      - GRAPH_RAG_SERVICE_PORT=${VAULT_SERVICE_PORT:=8000}
+      - VECTOR_RAG_SERVICE_HOST=${VAULT_SERVICE_HOST}
+      - VECTOR_RAG_SERVICE_PORT=${VAULT_SERVICE_PORT:=8000}
+      - CHATS_SERVICE_HOST=${VAULT_SERVICE_HOST}
+      - CHATS_SERVICE_HOST=${VAULT_SERVICE_PORT:=8000}
+      - HISTORY_SERVICE_HOST=${HISTORY_SERVICE_HOST}
+      - HISTORY_SERVICE_HOST=${VAULT_SERVICE_PORT:=8000}
+      - AUTH_SERVICE_HOST=${AUTH_SERVICE_HOST}
+      - AUTH_SERVICE_HOST=${VAULT_SERVICE_PORT:=8000}
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 1m
       timeout: 30s
       retries: 3
+      start_period: 1m
     depends_on:
       redis:
         condition: service_healthy
