@@ -22,12 +22,12 @@ async def decode_jwt(
         )
     except jwt.exceptions.InvalidSignatureError as invalid_signature:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token signature"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token signature"
         )
     except Exception as generic_error:
         logging.error(generic_error)
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
     return payload
 
@@ -64,7 +64,7 @@ def aiohttp_error_handler(service_name: str):
                 logging.error(content_error)
                 raise HTTPException(
                     status_code=status.HTTP_502_BAD_GATEWAY,
-                    detail=f"{service_name} service: invalid content type.",
+                    detail=f"{service_name} service returned invalid content type.",
                 )
             except Exception as generic_error:
                 logging.error(generic_error)
@@ -72,7 +72,7 @@ def aiohttp_error_handler(service_name: str):
                     raise generic_error
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"{service_name} service: an unexpected error occurred.",
+                    detail=f"{service_name} service encountered an unexpected error occurred.",
                 )
 
         return wrapper
