@@ -10,7 +10,7 @@ router = APIRouter(prefix="/qa", tags=["QA"])
 
 
 @router.post(
-    "/model/answer/generation",
+    "/generation",
     response_model=ModelAnswer,
     dependencies=[Depends(parse_jwt)],
     description="Генерация ответа LLM",

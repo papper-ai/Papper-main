@@ -51,7 +51,7 @@ async def chat_creation(
 
 
 @router.get(
-    "/chats/info/preview",
+    "/chats/preview",
     response_model=list[ChatPayload],
     description="Получение чатов пользователя (архивированные или нет). Если нужны архивированные - то передайте параметр is_archived=true (get_user_chats?is_archived=true). **ЧАТЫ БЕЗ ИСТОРИИ**",
 )
