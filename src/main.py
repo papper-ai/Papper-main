@@ -10,12 +10,13 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware
+from src.config import settings
 import uvicorn
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis = aioredis.from_url(url="redis://papper-main-redis:6379")
+    redis = aioredis.from_url(url=f"redis://{settings.redis_host}:{settings.redis_port}")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     timeout = aiohttp.ClientTimeout(total=120, connect=5)
     async with aiohttp.ClientSession(timeout=timeout) as session:
