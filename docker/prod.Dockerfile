@@ -7,7 +7,7 @@ RUN addgroup --gid 10001 papperuser && \
 WORKDIR /usr/data/app
 
 COPY requirements/base.txt requirements/
-RUN apt-get update && apt-get install curl -y\
+RUN apt-get update && apt-get install curl -y &&\
     pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements/base.txt && \
     apt-get clean && \
