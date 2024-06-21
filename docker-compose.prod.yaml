@@ -24,7 +24,7 @@ services:
       - papper-main-service-network
       - papper-backend
     ports:
-      - ${MAIN_SERVICE_PORT:-8080}:8000
+      - ${MAIN_SERVICE_PORT:-8090}:8000
     restart: unless-stopped
     environment:
       - VAULT_SERVICE_HOST=${VAULT_SERVICE_HOST}
