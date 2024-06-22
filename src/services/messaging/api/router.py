@@ -9,19 +9,11 @@ from ..schemas.chat import (
     ChangeChatArchiveStatus,
 )
 from ..schemas.user import UserCredentials
-from ..service import (
-    create_chat,
-    get_chats_by_user_id,
-    get_chat_by_user_id,
-    update_chat_name,
-    change_chat_archive_status,
-    clean_chat_history,
-    delete_chat,
-)
+from .dependencies import get_messaging_service
+from ..service.messaging import MessagingService
 from src.dependencies import parse_jwt, get_aiohttp_session
 from src.schemas import JWTPayload
 from typing import Annotated
-from fastapi_cache.decorator import cache
 
 router = APIRouter(prefix="/messaging", tags=["Messaging (Chats & History)"])
 
@@ -35,6 +27,7 @@ router = APIRouter(prefix="/messaging", tags=["Messaging (Chats & History)"])
 async def chat_creation(
     jwt_payload: Annotated[JWTPayload, Depends(parse_jwt)],
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    messaging_service: Annotated[MessagingService, Depends(get_messaging_service)],
     vault_id: Annotated[UUID4, Body()] = "1897e0cd88ee4b86a053972d05212a21",
     name: Annotated[str, Body(max_length=100)] = "Беседа по железобетону",
 ):
@@ -44,7 +37,7 @@ async def chat_creation(
         name=name,
     )
 
-    chat_payload = await create_chat(
+    chat_payload = await messaging_service.create_chat(
         registration_credentials=chat_creation_credentials, session=session
     )
     return chat_payload
@@ -55,14 +48,14 @@ async def chat_creation(
     response_model=list[ChatPayload],
     description="Получение чатов пользователя (архивированные или нет). Если нужны архивированные - то передайте параметр is_archived=true (get_user_chats?is_archived=true). **ЧАТЫ БЕЗ ИСТОРИИ**",
 )
-@cache(expire=240)
 async def getting_user_chats(
     jwt_payload: Annotated[JWTPayload, Depends(parse_jwt)],
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    messaging_service: Annotated[MessagingService, Depends(get_messaging_service)],
     is_archived: Annotated[bool, Query()] = False,
 ) -> list[ChatPayload]:
     user_credentials = UserCredentials(user_id=jwt_payload.user_id)
-    chat_payloads = await get_chats_by_user_id(
+    chat_payloads = await messaging_service.get_chats_by_user_id(
         session=session, user_credentials=user_credentials, is_archived=is_archived
     )
     return chat_payloads
@@ -74,13 +67,13 @@ async def getting_user_chats(
     dependencies=[Depends(parse_jwt)],
     description="Получение определённого чата по ID, **ВКЛЮЧАЯ ИСТОРИЮ**",
 )
-@cache(expire=240)
 async def getting_particular_chat(
     chat_id: Annotated[UUID4, Path()],
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    messaging_service: Annotated[MessagingService, Depends(get_messaging_service)],
 ) -> ChatPayload:
     chat_credentials = ChatCredentials(chat_id=chat_id)
-    chat_payload = await get_chat_by_user_id(
+    chat_payload = await messaging_service.get_chat_by_user_id(
         session=session, chat_credentials=chat_credentials
     )
     return chat_payload
@@ -95,8 +88,9 @@ async def getting_particular_chat(
 async def chat_renaming(
     update_chat: UpdateChat,
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    messaging_service: Annotated[MessagingService, Depends(get_messaging_service)],
 ) -> None:
-    await update_chat_name(
+    await messaging_service.update_chat_name(
         session=session,
         chat_update_credentials=update_chat,
     )
@@ -112,8 +106,9 @@ async def chat_renaming(
 async def chat_archiving(
     archive_chat: ChangeChatArchiveStatus,
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    messaging_service: Annotated[MessagingService, Depends(get_messaging_service)],
 ) -> None:
-    await change_chat_archive_status(
+    await messaging_service.change_chat_archive_status(
         session=session,
         change_archive_status_credentials=archive_chat,
     )
@@ -129,9 +124,10 @@ async def chat_archiving(
 async def chat_history_cleaning(
     chat_id: Annotated[UUID4, Path()],
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    messaging_service: Annotated[MessagingService, Depends(get_messaging_service)],
 ) -> None:
     chat_credentials = ChatCredentials(chat_id=chat_id)
-    await clean_chat_history(
+    await messaging_service.clean_chat_history(
         session=session,
         chat_credentials=chat_credentials,
     )
@@ -147,9 +143,10 @@ async def chat_history_cleaning(
 async def chat_deletion(
     chat_id: Annotated[UUID4, Path()],
     session: Annotated[aiohttp.ClientSession, Depends(get_aiohttp_session)],
+    messaging_service: Annotated[MessagingService, Depends(get_messaging_service)],
 ) -> None:
     chat_credentials = ChatCredentials(chat_id=chat_id)
-    await delete_chat(
+    await messaging_service.delete_chat(
         session=session,
         chat_credentials=chat_credentials,
     )

@@ -31,9 +31,22 @@ class RedisRepository(KeyValueDBAbstractRepository):
     async def delete(self, key) -> bool:
         return await self.client.delete(key)
 
+    async def delete_by_pattern(self, pattern: str) -> None:
+        pipe = self.client.pipeline(transaction=True)
+        async for key in self.client.scan_iter(match=pattern):
+            await pipe.delete(key)
+        await pipe.execute(raise_on_error=True)
+        return
+
     async def get(self, key):
         value = await self.client.get(key)
         return value
+
+    async def get_by_pattern(self, pattern: str) -> list[str]:
+        pipe = self.client.pipeline(transaction=True)
+        async for key in self.client.scan_iter(match=pattern):
+            await pipe.get(key)
+        return await pipe.execute(raise_on_error=True)
 
     async def clear(self):
         return await self.client.flushdb()
