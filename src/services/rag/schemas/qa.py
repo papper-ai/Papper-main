@@ -1,6 +1,8 @@
 from pydantic import BaseModel, UUID4, Field
-from src.messaging.schemas.history import UserMessageResponse, AIMessageResponse
-from src.messaging.schemas.history import AIMessage
+from src.services.messaging.schemas.history import (
+    UserMessageResponse,
+    AIMessageResponse,
+)
 
 
 class GenerationCredentials(BaseModel):

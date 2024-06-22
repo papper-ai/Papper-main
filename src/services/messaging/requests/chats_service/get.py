@@ -1,6 +1,6 @@
 import aiohttp
 from fastapi import HTTPException
-from src.vaults.schemas.vault import VaultCredentials
+from src.services.vaults.schemas.vault import VaultCredentials
 from src.utils import aiohttp_error_handler
 from ...schemas.user import UserCredentials
 from ...schemas.chat import ChatPayload, ChatCredentials

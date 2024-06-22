@@ -1,11 +1,10 @@
 from fastapi import Form, HTTPException, status
 from pydantic import UUID4
 from typing_extensions import Annotated
-from ..schemas import (
+from ..schemas.credentials import (
     RegistrationCredentials,
     AuthCredentials,
 )
-from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 

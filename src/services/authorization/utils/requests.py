@@ -1,11 +1,8 @@
-import json
-
 import aiohttp
-from fastapi import HTTPException, status
-import logging
+from fastapi import HTTPException
 from src.utils import aiohttp_error_handler
-
-from ..schemas import RegistrationCredentials, JWTRefreshRequest, AuthCredentials
+from ..schemas.credentials import RegistrationCredentials, AuthCredentials
+from ..schemas.tokens import JWTRefreshRequest
 
 
 @aiohttp_error_handler(service_name="Authorization")

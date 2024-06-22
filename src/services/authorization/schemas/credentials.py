@@ -1,5 +1,4 @@
-from pydantic import BaseModel, UUID4, Field, field_validator
-from typing import Annotated
+from pydantic import BaseModel, UUID4, field_validator
 from fastapi import HTTPException, status
 import re
 

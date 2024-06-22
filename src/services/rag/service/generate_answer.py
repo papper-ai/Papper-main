@@ -1,18 +1,16 @@
-import logging
-
 import aiohttp
 from ..requests.qa import get_answer_request
 from ..schemas.qa import GenerationCredentials, AnswerGenerationCredentials, ModelAnswer
-from src.vaults.requests.vault_service import get_vault_request
-from src.vaults.schemas.vault import VaultCredentials
-from src.messaging.schemas.chat import ChatCredentials
-from src.messaging.schemas.history import (
+from src.services.vaults.requests.vault_service import get_vault_request
+from src.services.vaults.schemas.vault import VaultCredentials
+from src.services.messaging.schemas.chat import ChatCredentials
+from src.services.messaging.schemas.history import (
     AddUserMessage,
     AddAIMessage,
     AIMessageResponse,
     UserMessage,
 )
-from src.messaging.requests.history_service import (
+from src.services.messaging.requests.history_service import (
     get_history_request,
     add_user_message_request,
     add_ai_message_request,

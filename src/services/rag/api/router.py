@@ -4,7 +4,6 @@ import aiohttp
 from fastapi import APIRouter, Depends
 from src.dependencies import parse_jwt, get_aiohttp_session
 from ..service import generate_answer
-from src.messaging.schemas.history import AIMessage
 
 router = APIRouter(prefix="/qa", tags=["QA"])
 

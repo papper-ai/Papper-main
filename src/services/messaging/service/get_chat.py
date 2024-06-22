@@ -7,7 +7,7 @@ from ..requests.chats_service import (
 from ..requests.history_service import get_history_request
 import aiohttp
 import asyncio
-from src.vaults.schemas.vault import VaultCredentials
+from src.services.vaults.schemas.vault import VaultCredentials
 from ..schemas.user import UserCredentials
 from ..requests.external_endpoints import chats_endpoints
 
@@ -55,7 +55,6 @@ async def get_chats_by_vault_id(
     session: aiohttp.ClientSession,
     vault_credentials: VaultCredentials,
 ) -> list[ChatPayload]:
-
     chat_payloads = await get_vault_chats_request(
         session=session,
         pydantic_model=vault_credentials,

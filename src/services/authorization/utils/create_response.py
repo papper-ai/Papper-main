@@ -1,4 +1,4 @@
-from ..schemas import JWTTokensResponse, AccessToken, RefreshToken
+from ..schemas.tokens import JWTTokensResponse, AccessToken, RefreshToken
 
 
 async def create_response_with_tokens(

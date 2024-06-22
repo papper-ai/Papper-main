@@ -1,7 +1,6 @@
 from pathlib import Path
-from pydantic import BaseModel, HttpUrl, FilePath
+from pydantic import BaseModel, FilePath
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import os
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -15,10 +14,11 @@ class JWTAuth(BaseModel):
 
 
 class Setting(BaseSettings):
-    model_config = SettingsConfigDict(env_file=BASE_DIR.parent / ".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     jwt_auth: JWTAuth = JWTAuth()
     redis_host: str
     redis_port: int
+    client_cache_ttl: int | None = None
 
 
 settings: Setting = Setting()

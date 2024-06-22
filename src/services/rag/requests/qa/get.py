@@ -2,7 +2,7 @@ import aiohttp
 from fastapi import HTTPException
 from src.utils import aiohttp_error_handler
 from ...schemas.qa import AnswerGenerationCredentials
-from src.messaging.schemas.history import AIMessage
+from src.services.messaging.schemas.history import AIMessage
 
 
 @aiohttp_error_handler(service_name="RAG")

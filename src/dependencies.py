@@ -13,9 +13,13 @@ async def get_aiohttp_session(request: Request) -> aiohttp.ClientSession:
 
 
 async def parse_jwt(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)]
+    | None = None,
+    token: str | None = None,
 ) -> JWTPayload:
-    token = credentials.credentials
+    if not (credentials or token):
+        raise ValueError
+    token = credentials.credentials if token is None else token
     dict_payload = await decode_jwt(token=token)
     payload = JWTPayload.model_validate(dict_payload)
     return payload

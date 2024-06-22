@@ -1,19 +1,21 @@
 from fastapi import APIRouter, Depends, status
 from typing import Annotated
-from ..schemas import JWTTokensResponse, JWTRefreshRequest, LoginResponse
-from .dependencies import (
-    authorize_user,
-    register_user,
-    get_new_tokens,
+from ..schemas.tokens import JWTTokensResponse, JWTRefreshRequest
+from ..schemas.login import LoginResponse
+from .dependencies import get_auth_service
+from ..service.auth import AuthService
+from ..schemas.credentials import AuthCredentials, RegistrationCredentials
+from ..utils.make_credentials import (
+    make_auth_credentials,
+    make_registration_credentials,
 )
-from fastapi_cache.decorator import cache
-from src.dependencies import parse_jwt
-from ...schemas import JWTPayload
+import aiohttp
+from src.utils import get_aiohttp_session
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
 
-
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+http_bearer = HTTPBearer()
 
 
 @router.post(
@@ -21,21 +23,47 @@ router = APIRouter(prefix="/auth", tags=["Authorization"])
     response_model=JWTTokensResponse,
     status_code=status.HTTP_200_OK,
 )
-async def login(jwt_tokens: Annotated[JWTTokensResponse, Depends(authorize_user)]):
+async def login(
+    auth_credentials: Annotated[
+        AuthCredentials,
+        Depends(make_auth_credentials),
+    ],
+    client_session: Annotated[
+        aiohttp.ClientSession,
+        Depends(get_aiohttp_session),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(get_auth_service),
+    ],
+):
     """
     На вход подаются данные в виде **HTML формы**.
     При успешной регистрации возвращаются 2 токена: access и refresh.\n
     Длина логина 3-20 символов, длина пароля 8-20 символов\n
     """
+    jwt_tokens = await auth_service.authorize_user(auth_credentials, client_session)
     return jwt_tokens
 
 
 @router.post(
     "/registration",
-    dependencies=[Depends(register_user)],
     status_code=status.HTTP_201_CREATED,
 )
-async def registration():
+async def registration(
+    registration_credentials: Annotated[
+        RegistrationCredentials,
+        Depends(make_registration_credentials),
+    ],
+    client_session: Annotated[
+        aiohttp.ClientSession,
+        Depends(get_aiohttp_session),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(get_auth_service),
+    ],
+):
     """
     На вход подаются данные в виде **HTML формы**.
     При успешной регистрации возвращается статус 201
@@ -46,20 +74,27 @@ async def registration():
     - должен содержать хотя бы 1 цифру
     - должен содержать хотя бы 1 спец. символ: `!@#$%^&*()`
     """
+    await auth_service.register_user(registration_credentials, client_session)
     return {"message": "Successfully registered"}
 
 
 @router.post(
     "/token/refresh/access",
     response_model=JWTTokensResponse,
+    description="На вход приходит refresh токен в теле запроса.\nПри успешном обновлении возвращаются 2 токена: access и refresh.",
 )
 async def refresh_tokens(
-    jwt_tokens: Annotated[JWTRefreshRequest, Depends(get_new_tokens)]
+    refresh_token: JWTRefreshRequest,
+    client_session: Annotated[
+        aiohttp.ClientSession,
+        Depends(get_aiohttp_session),
+    ],
+    auth_service: Annotated[
+        AuthService,
+        Depends(get_auth_service),
+    ],
 ):
-    """
-    На вход приходит refresh токен в теле запроса.
-    При успешном обновлении возвращаются 2 токена: access и refresh.
-    """
+    jwt_tokens = await auth_service.get_new_tokens(refresh_token, client_session)
     return jwt_tokens
 
 
@@ -67,6 +102,13 @@ async def refresh_tokens(
     "/user-login",
     response_model=LoginResponse,
 )
-@cache(expire=240)
-async def get_login(token_payload: Annotated[JWTPayload, Depends(parse_jwt)]):
-    return {"login": token_payload.login}
+async def get_login(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)],
+    auth_service: Annotated[
+        AuthService,
+        Depends(get_auth_service),
+    ],
+):
+    token = credentials.credentials
+    user_login = await auth_service.get_login(token=token)
+    return LoginResponse(login=user_login)
