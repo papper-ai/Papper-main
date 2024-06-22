@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 import aiohttp
 from contextlib import asynccontextmanager
-from src.authorization.api import auth_router
-from src.vaults.api import vault_router
-from src.messaging.api import messaging_router
-from src.rag.api import qa_router
+from src.services.authorization.api import auth_router
+from src.services.vaults.api import vault_router
+from src.services.messaging.api import messaging_router
+from src.services.rag.api import qa_router
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
@@ -16,7 +16,9 @@ import uvicorn
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis = aioredis.from_url(url=f"redis://{settings.redis_host}:{settings.redis_port}")
+    redis = aioredis.from_url(
+        url=f"redis://{settings.redis_host}:{settings.redis_port}"
+    )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     timeout = aiohttp.ClientTimeout(total=120, connect=5)
     async with aiohttp.ClientSession(timeout=timeout) as session:
