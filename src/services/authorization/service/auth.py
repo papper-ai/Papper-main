@@ -1,4 +1,4 @@
-from src.dependencies import parse_jwt
+from src.dependencies import parse_jwt_token
 from ..utils.cache import auth_cache_manager, AuthCache
 from ..schemas.credentials import AuthCredentials, RegistrationCredentials
 from ..schemas.tokens import JWTTokensResponse, JWTRefreshRequest
@@ -15,7 +15,7 @@ class AuthService:
     async def get_login(self, token: str) -> str:
         result = await self.cache_manager.get_login(token)
         if result is None:
-            jwt_payload = await parse_jwt(token=token)
+            jwt_payload = await parse_jwt_token(token=token)
             login = jwt_payload.login
             await self.cache_manager.set_login(token=token, login=login)
         else:

@@ -18,7 +18,7 @@ class Setting(BaseSettings):
     jwt_auth: JWTAuth = JWTAuth()
     redis_host: str
     redis_port: int
-    client_cache_ttl: int | None = None
+    client_cache_ttl: int = 600
 
 
 settings: Setting = Setting()

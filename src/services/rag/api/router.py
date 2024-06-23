@@ -2,7 +2,7 @@ from typing import Annotated
 from ..schemas.qa import GenerationCredentials, ModelAnswer
 import aiohttp
 from fastapi import APIRouter, Depends
-from src.dependencies import parse_jwt, get_aiohttp_session
+from src.dependencies import parse_jwt_bearer, get_aiohttp_session
 from ..service import generate_answer
 
 router = APIRouter(prefix="/qa", tags=["QA"])
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/qa", tags=["QA"])
 @router.post(
     "/generation",
     response_model=ModelAnswer,
-    dependencies=[Depends(parse_jwt)],
+    dependencies=[Depends(parse_jwt_bearer)],
     description="Генерация ответа LLM",
 )
 async def answer_generation(

@@ -1,3 +1,5 @@
+import uuid
+
 from ..schemas.chat import (
     ChangeChatArchiveStatus,
     CreateChat,
@@ -25,6 +27,7 @@ import asyncio
 import logging
 from fastapi import HTTPException, status
 from src.services.vaults.schemas.vault import VaultCredentials
+from ..schemas.history import HistoryPayload
 from ..schemas.user import UserCredentials
 from ..requests.external_endpoints import chats_endpoints
 from ..utils.cache import messaging_cache_manager
@@ -70,7 +73,7 @@ class MessagingService:
         is_archived: bool,
     ) -> list[ChatPayload]:
         chat_payloads = await self.cache_manager.get_chats(
-            user_id=user_credentials.user_id, is_archived=is_archived
+            id=user_credentials.user_id, is_archived=is_archived
         )
         if chat_payloads is None:
             endpoint = (
@@ -86,7 +89,7 @@ class MessagingService:
             )
 
             await self.cache_manager.set_chats(
-                user_id=user_credentials.user_id,
+                id=user_credentials.user_id,
                 is_archived=is_archived,
                 chat_payloads=chat_payloads,
             )
@@ -113,8 +116,9 @@ class MessagingService:
             )
         return chat_payloads
 
-    @staticmethod
     async def change_chat_archive_status(
+        self,
+        user_id: uuid.UUID,
         change_archive_status_credentials: ChangeChatArchiveStatus,
         session: aiohttp.ClientSession,
     ) -> None:
@@ -128,26 +132,29 @@ class MessagingService:
             pydantic_model=change_archive_status_credentials,
             endpoint=endpoint,
         )
+        await self.cache_manager.delete_chat(
+            chat_id=change_archive_status_credentials.chat_id
+        )
+        await self.cache_manager.delete_chats(id=user_id)
         return
 
-    @staticmethod
     async def clean_chat_history(
-        chat_credentials: ChatCredentials, session: aiohttp.ClientSession
+        self, chat_credentials: ChatCredentials, session: aiohttp.ClientSession
     ) -> None:
         await clean_history_request(
             session=session,
             pydantic_model=chat_credentials,
         )
+        await self.cache_manager.delete_chat(chat_id=chat_credentials.chat_id)
         return
 
-    @staticmethod
     async def create_chat(
-        registration_credentials: CreateChat, session: aiohttp.ClientSession
+        self, create_chat_credentials: CreateChat, session: aiohttp.ClientSession
     ) -> ChatPayload:
         try:
             chat_payload = await create_chat_request(
                 session=session,
-                pydantic_model=registration_credentials,
+                pydantic_model=create_chat_credentials,
             )
         except Exception as generic_error:
             if isinstance(generic_error, HTTPException):
@@ -172,15 +179,24 @@ class MessagingService:
 
             if isinstance(generic_error, HTTPException):
                 raise generic_error
+
             logging.error(generic_error)
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Failed to create history, for this reason chat was deleted",
             )
+
+        await self.cache_manager.set_chat(
+            chat_id=chat_payload.id, chat_payload=chat_payload
+        )
+        await self.cache_manager.delete_chats(id=create_chat_credentials.user_id)
         return chat_payload
 
     async def delete_chat(
-        self, chat_credentials: ChatCredentials, session: aiohttp.ClientSession
+        self,
+        user_id: uuid.UUID,
+        chat_credentials: ChatCredentials,
+        session: aiohttp.ClientSession,
     ) -> None:
         try:
             await delete_history_request(
@@ -209,11 +225,13 @@ class MessagingService:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Failed to delete chat, for this reason chat history restored",
             )
-        await self.cache_manager.delete_chats(chat_credentials.chat_id)
+        await self.cache_manager.delete_chats(id=user_id)
+        await self.cache_manager.delete_chat(chat_id=chat_credentials.chat_id)
         return
 
-    @staticmethod
     async def update_chat_name(
+        self,
+        user_id: uuid.UUID,
         chat_update_credentials: UpdateChat,
         session: aiohttp.ClientSession,
     ) -> None:
@@ -221,4 +239,17 @@ class MessagingService:
             session=session,
             pydantic_model=chat_update_credentials,
         )
+        await self.cache_manager.delete_chat(chat_id=chat_update_credentials.chat_id)
+        await self.cache_manager.delete_chats(id=user_id)
         return
+
+    async def get_chat_history(
+        self,
+        user_id: uuid.UUID,
+        chat_credentials: ChatCredentials,
+        session: aiohttp.ClientSession,
+    ) -> HistoryPayload:
+        history = await get_history_request(
+            session=session, pydantic_model=chat_credentials
+        )
+        return history
