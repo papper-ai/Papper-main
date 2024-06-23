@@ -60,6 +60,7 @@ class MessagingService:
             )
 
             chat_payload.chat_history = history_payload
+            print(chat_payload)
             await self.cache_manager.set_chat(
                 chat_id=chat_credentials.chat_id, chat_payload=chat_payload
             )
@@ -186,6 +187,7 @@ class MessagingService:
                 detail="Failed to create history, for this reason chat was deleted",
             )
 
+        chat_payload.chat_history = HistoryPayload(history=[])
         await self.cache_manager.set_chat(
             chat_id=chat_payload.id, chat_payload=chat_payload
         )
@@ -243,9 +245,8 @@ class MessagingService:
         await self.cache_manager.delete_chats(id=user_id)
         return
 
+    @staticmethod
     async def get_chat_history(
-        self,
-        user_id: uuid.UUID,
         chat_credentials: ChatCredentials,
         session: aiohttp.ClientSession,
     ) -> HistoryPayload:

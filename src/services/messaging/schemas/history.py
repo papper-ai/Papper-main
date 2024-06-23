@@ -1,4 +1,4 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel, UUID4, ConfigDict
 
 
 class TracebackUnit(BaseModel):
@@ -44,5 +44,5 @@ class UserMessageResponse(BaseMessageResponse):
 
 
 class HistoryPayload(BaseModel):
-    chat_id: UUID4
+    model_config = ConfigDict(extra="ignore")
     history: list[UserMessageResponse | AIMessageResponse | None]

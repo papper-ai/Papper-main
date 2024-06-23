@@ -26,7 +26,5 @@ async def get_history_request(
         else:
             processed_history.append(AIMessageResponse(**history))
 
-    history_payload = HistoryPayload(
-        chat_id=result["chat_id"], history=processed_history
-    )
+    history_payload = HistoryPayload(history=processed_history)
     return history_payload

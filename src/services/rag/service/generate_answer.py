@@ -10,7 +10,6 @@ from src.services.messaging.schemas.history import (
     UserMessage,
 )
 from src.services.messaging.requests.history_service import (
-    get_history_request,
     add_user_message_request,
     add_ai_message_request,
 )
@@ -39,7 +38,9 @@ async def generate_answer(
     get_vault = vaults_service.get_vault(
         session=session, vault_credentials=vault_credentials
     )
-    get_history = get_history_request(session=session, pydantic_model=chat_credentials)
+    get_history = messaging_service.get_chat_history(
+        session=session, chat_credentials=chat_credentials
+    )
 
     vault_payload, chat_history = await asyncio.gather(
         get_vault, get_history, return_exceptions=True
@@ -122,7 +123,6 @@ async def generate_answer(
         if add_user_message_error is not None
         else {False: ""}
     )
-
     if not history_error:
         await messaging_service.cache_manager.delete_chat(
             chat_id=generation_credentials.chat_id
