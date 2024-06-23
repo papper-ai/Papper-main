@@ -27,6 +27,10 @@ async def generate_answer(
     generation_credentials: GenerationCredentials,
     session: aiohttp.ClientSession,
 ) -> ModelAnswer:
+    await messaging_service.cache_manager.delete_chat(
+        chat_id=generation_credentials.chat_id
+    )
+
     history_error = None
     vault_error = None
     add_user_message_error = None
@@ -70,6 +74,7 @@ async def generate_answer(
         if chat_history is not None
         else []
     )
+
     answer_generation_credentials = AnswerGenerationCredentials(
         vault_id=vault_payload.id if vault_payload is not None else None,
         query=generation_credentials.query,
@@ -123,10 +128,6 @@ async def generate_answer(
         if add_user_message_error is not None
         else {False: ""}
     )
-    if not history_error:
-        await messaging_service.cache_manager.delete_chat(
-            chat_id=generation_credentials.chat_id
-        )
 
     return ModelAnswer(
         ai_message=AIMessageResponse(**answer.model_dump(), role="ai"),
