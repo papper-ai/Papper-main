@@ -1,11 +1,3 @@
 # Главный сервис backend
-
-## **Swagger UI доступен по адресу:**
-[http://semograph.com:28080/docs#/](http://semograph.com:28080/docs#/)
-
-## **Токен для регистрации пользователя (универсальный):**
-`f3de5626-a9a5-4546-966e-d9fb69910e68`
-
-## **Пользователь для тестов**
-- Логин: `kaban1984`
-- Пароль: `k21nGa!130o`
+- papper-main-service
+- papper-main-redis
