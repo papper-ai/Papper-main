@@ -130,7 +130,10 @@ class VaultsService:
         await self.cache_manager.delete_document(
             document_id=document_credentials.document_id
         )
-        await self.cache_manager.delete_vault(document_credentials.vault_id)
+        await self.cache_manager.delete_vault(vault_id=document_credentials.vault_id)
+        await self.cache_manager.delete_documents(
+            vault_id=document_credentials.vault_id
+        )
         return
 
     async def update_vault_name(
