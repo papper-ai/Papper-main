@@ -2,6 +2,7 @@ import uuid
 from ..schemas.chat import ChatPayload
 import json
 from src.repositories.redis import RedisRepository
+from ..schemas.history import UserMessageResponse, AIMessageResponse, HistoryPayload
 
 
 class MessagingCache:
@@ -15,8 +16,22 @@ class MessagingCache:
         result = await self.redis.get(
             f"{self.cache_prefix}{self.chat_prefix}{chat_id.hex}"
         )
-        chat_payload = ChatPayload.model_validate_json(result) if result else None
-        return chat_payload
+
+        json_result = json.loads(result) if result else None
+
+        processed_history = []
+        if json_result is not None:
+            for history in json_result["history"]:
+                if history["role"] == "user":
+                    processed_history.append(UserMessageResponse(**history))
+                else:
+                    processed_history.append(AIMessageResponse(**history))
+            history_payload = HistoryPayload(history=processed_history)
+            chat_payload = ChatPayload.model_validate_json(result)
+            chat_payload.chat_history = history_payload
+            return chat_payload
+        else:
+            return None
 
     async def set_chat(self, chat_id: uuid.UUID, chat_payload: ChatPayload) -> bool:
         str_chat_payload = chat_payload.model_dump_json()
