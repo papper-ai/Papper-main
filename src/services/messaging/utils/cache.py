@@ -18,10 +18,9 @@ class MessagingCache:
         )
 
         json_result = json.loads(result) if result else None
-        print(json_result)
         processed_history = []
         if json_result is not None:
-            for history in json_result["history"]:
+            for history in json_result["chat_history"]["history"]:
                 if history["role"] == "user":
                     processed_history.append(UserMessageResponse(**history))
                 else:

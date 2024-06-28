@@ -60,7 +60,6 @@ class MessagingService:
             )
 
             chat_payload.chat_history = history_payload
-            print(chat_payload)
             await self.cache_manager.set_chat(
                 chat_id=chat_credentials.chat_id, chat_payload=chat_payload
             )
